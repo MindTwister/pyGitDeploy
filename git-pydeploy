@@ -1,0 +1,34 @@
+#!python
+from git import *
+
+class Deploy:
+    deleteFiles = []
+    updatedFiles = []
+    def __init__(self):
+        self.repo = Repo("")
+        changes = self.repo.commit('c6d5bacb').diff('HEAD')
+        print "Added files:"
+        for fileAdded in changes.iter_change_type('A'):
+            print "  ",fileAdded.b_blob.path
+            self.updatedFiles.append(fileAdded.b_blob.path)
+        
+        print "Updated files"
+        for fileUpdated in changes.iter_change_type('M'):
+            print "  ",fileUpdated.a_blob.path
+            self.updatedFiles.append(fileUpdated.a_blob.path)
+        
+        print "Deleted files"
+        for fileDeleted in changes.iter_change_type('D'):
+            print "  ",fileDeleted.a_blob.path
+            self.deletedFiles.push(fileDeleted.a_blob.path)
+        
+        print "Renamed files"
+        for fileRenamed in changes.iter_change_type('D'):
+            print fileRenamed.a_blob.path
+            print fileRenamed.b_blob.path
+            
+        
+
+if __name__ == "__main__":
+    deploy = Deploy()
+    
