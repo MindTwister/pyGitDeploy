@@ -1,10 +1,17 @@
 #!python
 from git import *
+import sys,getpass,ftplib
 
 class Deploy:
-    deleteFiles = []
+    deletedFiles = []
     updatedFiles = []
+    
     def __init__(self):
+        self.checkFiles()
+        self.connectFTP()
+        self.uploadFiles()
+    
+    def checkFiles(self):
         self.repo = Repo("")
         changes = self.repo.commit('c6d5bacb').diff('HEAD')
         print "Added files:"
@@ -20,13 +27,61 @@ class Deploy:
         print "Deleted files"
         for fileDeleted in changes.iter_change_type('D'):
             print "  ",fileDeleted.a_blob.path
-            self.deletedFiles.push(fileDeleted.a_blob.path)
+            self.deletedFiles.append(fileDeleted.a_blob.path)
         
         print "Renamed files"
-        for fileRenamed in changes.iter_change_type('D'):
-            print fileRenamed.a_blob.path
-            print fileRenamed.b_blob.path
+        for fileRenamed in changes.iter_change_type('R'):
+            print "  From: ",fileRenamed.a_blob.path, " to ", fileRenamed.b_blob.path
+
+    
+    def connectFTP(self,rebuild_config=False):
+        configReader = self.repo.config_reader()
+        
+        if configReader.has_option("ftp","remoteServer"):
+            remoteServer = configReader.get_value("ftp","remoteServer")
+        else:
+            remoteServer = raw_input("Server: ")
+        
+        
+        if configReader.has_option("ftp","remoteUser"):
+            remoteUser = configReader.get_value("ftp","remoteUser")
+        else:
+            remoteUser = raw_input("Username: ")
+        
+        if configReader.has_option("ftp","remotePassword"):
+            remotePassword = configReader.get_value("ftp","remotePassword")
+            savePass = True
+        else:
+            remotePassword = getpass.getpass("Password: ")
+            if(configReader.has_option("ftp","savePass") == False):
+                if raw_input("Save password (y/n):").lower() == "y":
+                    savePass = True
+            else:
+                savePass = False
+        
+        if configReader.has_option("ftp","remoteDir"):
+            remoteDir = configReader.get_value("ftp","remoteDir")
+        else:
+            remoteDir = raw_input("Remote directory (default=/): ")
+        
+        while remoteDir.startswith("/"):
+            remoteDir = remoteDir[1:]
+        
+        try:
+            self.ftp = ftplib.FTP(remoteServer,remoteUser,remotePassword)
+            self.ftp.cwd("/" + remoteDir)
+        except ftplib.all_errors as connectionError:
+            print "Error connecting to server: ", connectionError
+            if raw_input("Retry (y/n)?: ").lower() == "y":
+                self.connectFTP()
+            else:
+                exit(255)
             
+        
+        
+    def uploadFiles(self):
+        for file in self.updatedFiles:
+            self.ftp.storbinary("STOR " + file,open(file,'r'))
         
 
 if __name__ == "__main__":
