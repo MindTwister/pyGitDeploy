@@ -1,7 +1,8 @@
 pyGitDeploy
 ===========
 
-A script for rapid deployment to FTP servers
+A script for rapid deployment to FTP servers.
+The script uses git to find changes since last deployment and applies the changes to an FTP server, if no deployment has been made it uploads all watched files.
 
 Requirements:
 -----
@@ -11,9 +12,9 @@ Requirements:
 
 Usage:
 ------
-Assuming python and this script is in your path
+Assuming python and this script is in your path:
 
-git pydeploy
+    git pydeploy
 
 Tested environments:
 --------------------
@@ -36,3 +37,4 @@ Todo:
 * Add named deployments
  * Named deployments should work as aliases for different servers; `git deploy staging` `git deploy production`
 * Bind a specific branch to a named deployment to merge config changes. (merge staging branch with current THEN upload)
+* Make the verbosity optional
