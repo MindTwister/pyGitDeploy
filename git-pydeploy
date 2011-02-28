@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from git import *
-import sys,getpass,ftplib
+import sys,getpass,ftplib,weakref
 
 class Deploy:
     deletedFiles = []
@@ -73,6 +73,9 @@ class Deploy:
         while remoteDir.startswith("/"):
             remoteDir = remoteDir[1:]
         
+        while remoteDir.endswith("/"):
+            remoteDir = remoteDir[:-1]
+        
         try:
             self.ftp = ftplib.FTP(remoteServer,remoteUser,remotePassword)
             self.ftp.cwd("/" + remoteDir)
@@ -82,8 +85,40 @@ class Deploy:
                 self.connectFTP()
             else:
                 exit(255)
+                
+        self.rootFolder =  remoteDir
+    
+    def parseDirectories(self):
+        self.dirs = {}
+        for file in self.updatedFiles:
+            dirs = file.split('/')[:-1]
+            cwd = self.dirs
+            for dir in dirs:
+                if dir not in cwd:
+                    cwd[dir] = {}
+                    
+                cwd = cwd[dir]
+    
+    def checkDirectories(self,cwd = "",folders = {}):
+        if cwd == "":
+            cwd = "/" + self.rootFolder
+            folders = self.dirs
+        if self.ftp:
+            print "Checking folders under ", cwd
             
-        
+            for dir,subFolders in folders.iteritems():
+                
+                print "Checking ", cwd + "/" + dir
+                try:
+                    self.ftp.cwd(cwd + "/" + dir)
+                except:
+                    print "Creating previously non-existing folder", cwd + "/" + dir
+                    self.ftp.mkd(cwd + "/" + dir)
+                self.checkDirectories(cwd+"/"+dir,subFolders)
+                
+            if cwd == "/" + self.rootFolder:
+                self.ftp.cwd(cwd)
+    
         
     def uploadFiles(self):
         for file in self.updatedFiles:
@@ -93,4 +128,9 @@ class Deploy:
 
 if __name__ == "__main__":
     deploy = Deploy()
-    
+    deploy.checkFiles()
+    deploy.connectFTP()
+    deploy.parseDirectories()
+    deploy.checkDirectories()
+    deploy.uploadFiles()
+
