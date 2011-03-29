@@ -44,41 +44,41 @@ class Deploy:
     def connectFTP(self,rebuild_config=False):
         
         if self.configReader.has_option("ftp","remoteServer"):
-            remoteServer = self.configReader.get_value("ftp","remoteServer")
+            self.remoteServer = self.configReader.get_value("ftp","remoteServer")
         else:
-            remoteServer = raw_input("Server: ")
+            self.remoteServer = raw_input("Server: ")
         
         
         if self.configReader.has_option("ftp","remoteUser"):
-            remoteUser = self.configReader.get_value("ftp","remoteUser")
+            self.remoteUser = self.configReader.get_value("ftp","remoteUser")
         else:
-            remoteUser = raw_input("Username: ")
+            self.remoteUser = raw_input("Username: ")
         
         if self.configReader.has_option("ftp","remotePassword"):
-            remotePassword = self.configReader.get_value("ftp","remotePassword")
-            savePass = True
+            self.remotePassword = self.configReader.get_value("ftp","remotePassword")
+            self.savePass = True
         else:
-            remotePassword = getpass.getpass("Password: ")
+            self.remotePassword = getpass.getpass("Password: ")
             if(self.configReader.has_option("ftp","savePass") == False):
                 if raw_input("Save password (y/n):").lower() == "y":
-                    savePass = True
+                    self.savePass = True
             else:
-                savePass = False
+                self.savePass = False
         
         if self.configReader.has_option("ftp","remoteDir"):
-            remoteDir = self.configReader.get_value("ftp","remoteDir")
+            self.remoteDir = self.configReader.get_value("ftp","remoteDir")
         else:
-            remoteDir = raw_input("Remote directory (default=/): ")
+            self.remoteDir = raw_input("Remote directory (default=/): ")
         
         while remoteDir.startswith("/"):
-            remoteDir = remoteDir[1:]
+            self.remoteDir = self.remoteDir[1:]
         
         while remoteDir.endswith("/"):
-            remoteDir = remoteDir[:-1]
+            self.remoteDir = self.remoteDir[:-1]
         
         try:
-            self.ftp = ftplib.FTP(remoteServer,remoteUser,remotePassword)
-            self.ftp.cwd("/" + remoteDir)
+            self.ftp = ftplib.FTP(self.remoteServer,self.remoteUser,self.remotePassword)
+            self.ftp.cwd("/" + self.remoteDir)
         except ftplib.all_errors as connectionError:
             print "Error connecting to server: ", connectionError
             if raw_input("Retry (y/n)?: ").lower() == "y":
@@ -86,7 +86,7 @@ class Deploy:
             else:
                 exit(255)
                 
-        self.rootFolder =  remoteDir
+        self.rootFolder =  self.remoteDir
     
     def parseDirectories(self):
         self.dirs = {}
@@ -125,6 +125,11 @@ class Deploy:
             self.ftp.storbinary("STOR " + file,open(file,'r'))
         infoWriter = self.repo.config_writer()
         infoWriter.set_value('ftp','lastDeploy',self.repo.head.reference.log()[-1].newhexsha)
+        infoWriter.set_value('ftp','remoteUser',self.remoteUser)
+        infoWriter.set_value('ftp','remoteDir',self.remoteDir)
+        infoWriter.set_value('ftp','remoteServer',self.remoteServer)
+        if self.savePass:
+            infoWriter.set_value('ftp','remotePassword',self.remotePassword)
 
 if __name__ == "__main__":
     deploy = Deploy()
