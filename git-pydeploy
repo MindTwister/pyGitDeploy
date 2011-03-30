@@ -9,9 +9,9 @@ class Deploy:
     def __init__(self):
         self.repo = Repo("")
         self.configReader = self.repo.config_reader()
-        self.checkFiles()
-        self.connectFTP()
-        self.uploadFiles()
+        #self.checkFiles()
+        #self.connectFTP()
+        #self.uploadFiles()
     
     def checkFiles(self):
         
@@ -54,6 +54,8 @@ class Deploy:
         else:
             self.remoteUser = raw_input("Username: ")
         
+        self.savePass = False
+        
         if self.configReader.has_option("ftp","remotePassword"):
             self.remotePassword = self.configReader.get_value("ftp","remotePassword")
             self.savePass = True
@@ -62,18 +64,16 @@ class Deploy:
             if(self.configReader.has_option("ftp","savePass") == False):
                 if raw_input("Save password (y/n):").lower() == "y":
                     self.savePass = True
-            else:
-                self.savePass = False
         
         if self.configReader.has_option("ftp","remoteDir"):
             self.remoteDir = self.configReader.get_value("ftp","remoteDir")
         else:
             self.remoteDir = raw_input("Remote directory (default=/): ")
         
-        while remoteDir.startswith("/"):
+        while self.remoteDir.startswith("/"):
             self.remoteDir = self.remoteDir[1:]
         
-        while remoteDir.endswith("/"):
+        while self.remoteDir.endswith("/"):
             self.remoteDir = self.remoteDir[:-1]
         
         try:
