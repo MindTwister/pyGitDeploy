@@ -7,6 +7,9 @@ The script uses git to find changes since last deployment and applies the change
 
 New in version:
 -----
+### 0.5.3 ###
+* More verbosity
+
 ### 0.5.2 ###
 * Made it possible to specify a specific state to deploy (in preperation for `git deploy --revert`)
 
