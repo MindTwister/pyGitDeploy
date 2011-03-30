@@ -176,8 +176,8 @@ if __name__ == "__main__":
         commit = "HEAD"
             
     deploy.checkFiles(commit)
-    deploy.connectFTP()
     deploy.parseDirectories()
+    deploy.connectFTP()
     deploy.checkDirectories()
     deploy.uploadFiles()
 
