@@ -7,6 +7,9 @@ The script uses git to find changes since last deployment and applies the change
 
 New in version:
 -----
+### 0.5.2 ###
+* Made it possible to specify a specific state to deploy (in preperation for `git deploy --revert`)
+
 ### 0.5.1 ###
 * Better format for default values
 * Retains previously input values as default (except for password)
@@ -25,6 +28,14 @@ Usage:
 Assuming python and this script is in your path:
 
     git pydeploy
+    
+Advanced:
+
+    git deploy <commit>
+
+When specifying which commit to deploy the script will still only compare to what is online and make the changes aka. diff works both ways.
+    
+The script will
 
 Tested environments:
 --------------------
@@ -42,7 +53,6 @@ Todo:
 
 * Remove deleted files since last commit
 * Add active or passive mode to configuration options
-* Make it possible to specify a specific state to deploy (in preperation for `git deploy --revert`)
 * Add `--revert` to quickly go back to last deployment
 * Add named deployments
  * Named deployments should work as aliases for different servers; `git deploy staging` `git deploy production`

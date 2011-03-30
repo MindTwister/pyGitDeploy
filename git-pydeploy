@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from git import *
-import sys,getpass,ftplib
+import sys,getpass,ftplib,getopt
 #readline is not available on windows
 try:
     import readline
@@ -39,14 +39,14 @@ class Deploy:
             return val
     
     
-    def checkFiles(self):
+    def checkFiles(self,deployVersion):
         
         if self.configReader.has_option("ftp","lastDeploy"):
             lastDeploy = self.configReader.get_value("ftp","lastDeploy")
         else:
             lastDeploy = self.repo.head.reference.log()[0].newhexsha
             
-        changes = self.repo.commit(lastDeploy).diff('HEAD')
+        changes = self.repo.commit(lastDeploy).diff(deployVersion)
         print "Added files:"
         for fileAdded in changes.iter_change_type('A'):
             print "  ",fileAdded.b_blob.path
@@ -168,7 +168,13 @@ class Deploy:
 
 if __name__ == "__main__":
     deploy = Deploy()
-    deploy.checkFiles()
+    options, arguments = getopt.getopt(sys.argv[1:],"")
+    if len(arguments):
+        commit = arguments[0]
+    else:
+        commit = "HEAD"
+            
+    deploy.checkFiles(commit)
     deploy.connectFTP()
     deploy.parseDirectories()
     deploy.checkDirectories()
