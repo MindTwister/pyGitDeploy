@@ -7,6 +7,10 @@ The script uses git to find changes since last deployment and applies the change
 
 New in version:
 -----
+### 0.5.4 ###
+* Verbosity now a paramter
+* Added -n or --dry-run for a simulated run (no upload, no directories created remotely)
+
 ### 0.5.3 ###
 * More verbosity
 
@@ -34,11 +38,10 @@ Assuming python and this script is in your path:
     
 Advanced:
 
-    git deploy <commit>
+    git deploy [-v <level>| --verbose <level>] [-n | --dry-run] <commit>
 
 When specifying which commit to deploy the script will still only compare to what is online and make the changes aka. diff works both ways.
-    
-The script will
+
 
 Tested environments:
 --------------------
@@ -60,7 +63,8 @@ Todo:
 * Add named deployments
  * Named deployments should work as aliases for different servers; `git deploy staging` `git deploy production`
 * Bind a specific branch to a named deployment to merge config changes. (merge staging branch with current THEN upload)
-* Make the verbosity optional
+* Verbosity levels
+* Document command line options
 
 Thanks:
 -------

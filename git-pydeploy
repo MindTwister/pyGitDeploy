@@ -1,6 +1,8 @@
 #!/usr/bin/env python
+from __future__ import print_function
 from git import *
 import sys,getpass,ftplib,getopt
+
 #readline is not available on windows
 try:
     import readline
@@ -13,8 +15,12 @@ class Deploy:
     updatedFiles = []
     
     def __init__(self):
+        self.verbose = False
         self.repo = Repo("")
         self.configReader = self.repo.config_reader()
+    
+    def setVerbose(self,verbose):
+        self.verbose = verbose
     
     #raw_input with editable default values
     def raw_input_default(self,prompt, default):
@@ -47,24 +53,25 @@ class Deploy:
             lastDeploy = self.repo.head.reference.log()[0].newhexsha
             
         changes = self.repo.commit(lastDeploy).diff(deployVersion)
-        print "Added files:"
+        
+        self.out("Added files:")
         for fileAdded in changes.iter_change_type('A'):
-            print "  ",fileAdded.b_blob.path
+            self.out("  ",fileAdded.b_blob.path)
             self.updatedFiles.append(fileAdded.b_blob.path)
         
-        print "Updated files"
+        self.out("Updated files")
         for fileUpdated in changes.iter_change_type('M'):
-            print "  ",fileUpdated.a_blob.path
+            self.out("  ",fileUpdated.a_blob.path)
             self.updatedFiles.append(fileUpdated.a_blob.path)
         
-        print "Deleted files"
+        self.out("Deleted files")
         for fileDeleted in changes.iter_change_type('D'):
-            print "  ",fileDeleted.a_blob.path
+            self.out("  ",fileDeleted.a_blob.path)
             self.deletedFiles.append(fileDeleted.a_blob.path)
         
-        print "Renamed files"
+        self.out("Renamed files")
         for fileRenamed in changes.iter_change_type('R'):
-            print "  From: ",fileRenamed.a_blob.path, " to ", fileRenamed.b_blob.path
+            self.out("  From: ",fileRenamed.a_blob.path, " to ", fileRenamed.b_blob.path)
 
     
     def connectFTP(self,rebuild_config=False):
@@ -115,7 +122,7 @@ class Deploy:
             self.ftp = ftplib.FTP(self.remoteServer,self.remoteUser,self.remotePassword)
             self.ftp.cwd("/" + self.remoteDir)
         except ftplib.all_errors as connectionError:
-            print "Error connecting to server: ", connectionError
+            self.out("Error connecting to server: ", connectionError,verbosity=0)
             if raw_input("Retry (y/n)?: ").lower() == "y":
                 self.connectFTP(True)
             else:
@@ -134,50 +141,86 @@ class Deploy:
                     
                 cwd = cwd[dir]
     
-    def checkDirectories(self,cwd = "",folders = {}):
+    def checkDirectories(self,cwd = "",folders = {},dry=False):
         if cwd == "":
             cwd = "/" + self.rootFolder
             folders = self.dirs
         if self.ftp:
-            print "Checking folders under", cwd
+            self.out("Checking folders under", cwd)
             
             for dir,subFolders in folders.iteritems():
                 
-                print "Checking ", cwd + "/" + dir
+                self.out("Checking ", cwd + "/" + dir)
                 try:
                     self.ftp.cwd(cwd + "/" + dir)
                 except:
-                    print "Creating previously non-existing folder", cwd + "/" + dir
-                    self.ftp.mkd(cwd + "/" + dir)
+                    self.out("Creating previously non-existing folder", cwd + "/" + dir)
+                    if not dry:
+                        self.ftp.mkd(cwd + "/" + dir)
                 self.checkDirectories(cwd+"/"+dir,subFolders)
                 
             if cwd == "/" + self.rootFolder:
                 self.ftp.cwd(cwd)
     
         
-    def uploadFiles(self):
+    def uploadFiles(self,dry=False):
         for file in self.updatedFiles:
-            print "Uploading",file
-            self.ftp.storbinary("STOR " + file,open(file,'r'))
+            self.out("Uploading",file,verbosity=0)
+            if not dry:
+                self.ftp.storbinary("STOR " + file,open(file,'r'))
         infoWriter = self.repo.config_writer()
-        infoWriter.set_value('ftp','lastDeploy',self.repo.head.reference.log()[-1].newhexsha)
+        if not dry:
+            infoWriter.set_value('ftp','lastDeploy',self.repo.head.reference.log()[-1].newhexsha)
         infoWriter.set_value('ftp','remoteUser',self.remoteUser)
         infoWriter.set_value('ftp','remoteDir',self.remoteDir)
         infoWriter.set_value('ftp','remoteServer',self.remoteServer)
         if self.savePass:
             infoWriter.set_value('ftp','remotePassword',self.remotePassword)
+            
+    def out(self,*args,**kwargs):
+        try:
+            verbosity = kwargs["verbosity"]
+        except:
+            verbosity = 5
+        if self.verbose >= verbosity:
+            for a in args:
+                if a != "":
+                    print(a,end=" ")
+            print("")
 
 if __name__ == "__main__":
-    deploy = Deploy()
-    options, arguments = getopt.getopt(sys.argv[1:],"")
+    
+    args = {
+        "dry" : False,
+        "commit" : "HEAD",
+        "verbose" : 1
+    }
+
+    options, arguments = getopt.getopt(sys.argv[1:],"vn",["dry-run","verbose"])
     if len(arguments):
-        commit = arguments[0]
+        args["commit"] = arguments[0]
     else:
-        commit = "HEAD"
+        args["commit"] = "HEAD"
+    
+    for option, value in options:
+        if option in ("-n", "--dry-run"):
+            args["dry"] = True
+        
+        if option in ("-v","--verbose"):
+            if value == "":
+                value = 5
+            args["verbose"] = value
+    
+    
+    deploy = Deploy()
+    
+    if args["verbose"]:
+        deploy.setVerbose(args["verbose"])
             
-    deploy.checkFiles(commit)
+    deploy.checkFiles(args["commit"])
     deploy.parseDirectories()
     deploy.connectFTP()
-    deploy.checkDirectories()
-    deploy.uploadFiles()
+    deploy.checkDirectories(args["dry"])
+    deploy.uploadFiles(args["dry"])
+    
 
