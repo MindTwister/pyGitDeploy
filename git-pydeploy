@@ -1,6 +1,12 @@
 #!/usr/bin/env python
 from git import *
-import sys,getpass,ftplib,weakref
+import sys,getpass,ftplib
+#readline is not available on windows
+try:
+    import readline
+    gotReadline = True
+except ImportError:
+    gotReadline = False
 
 class Deploy:
     deletedFiles = []
@@ -9,9 +15,29 @@ class Deploy:
     def __init__(self):
         self.repo = Repo("")
         self.configReader = self.repo.config_reader()
-        #self.checkFiles()
-        #self.connectFTP()
-        #self.uploadFiles()
+    
+    #raw_input with editable default values
+    def raw_input_default(self,prompt, default):
+        if gotReadline:
+            def pre_input_hook():
+                readline.insert_text(default)
+                readline.redisplay()
+      
+            readline.set_pre_input_hook(pre_input_hook)
+            try:
+                return raw_input(prompt)
+            finally:
+                readline.set_pre_input_hook(None)
+        else:
+            #No readline :(
+            if(default != ""):
+                prompt = "[" + default + "] " + prompt
+            
+            val = raw_input(prompt)
+            if val == "":
+                val = default
+            return val
+    
     
     def checkFiles(self):
         
@@ -46,13 +72,19 @@ class Deploy:
         if self.configReader.has_option("ftp","remoteServer"):
             self.remoteServer = self.configReader.get_value("ftp","remoteServer")
         else:
-            self.remoteServer = raw_input("Server: ")
+            default = ""
+            if rebuild_config:
+                default = self.remoteServer
+            self.remoteServer = self.raw_input_default("Server: ",default)
         
         
         if self.configReader.has_option("ftp","remoteUser"):
             self.remoteUser = self.configReader.get_value("ftp","remoteUser")
         else:
-            self.remoteUser = raw_input("Username: ")
+            default = ""
+            if rebuild_config:
+                default = self.remoteServer
+            self.remoteUser = self.raw_input_default("Username: ",default)
         
         self.savePass = False
         
@@ -68,7 +100,10 @@ class Deploy:
         if self.configReader.has_option("ftp","remoteDir"):
             self.remoteDir = self.configReader.get_value("ftp","remoteDir")
         else:
-            self.remoteDir = raw_input("Remote directory (default=/): ")
+            default = ""
+            if rebuild_config:
+                default = self.remoteServer
+            self.remoteDir = self.raw_input_default("Remote directory: ","/")
         
         while self.remoteDir.startswith("/"):
             self.remoteDir = self.remoteDir[1:]
@@ -82,7 +117,7 @@ class Deploy:
         except ftplib.all_errors as connectionError:
             print "Error connecting to server: ", connectionError
             if raw_input("Retry (y/n)?: ").lower() == "y":
-                self.connectFTP()
+                self.connectFTP(True)
             else:
                 exit(255)
                 
@@ -104,7 +139,7 @@ class Deploy:
             cwd = "/" + self.rootFolder
             folders = self.dirs
         if self.ftp:
-            print "Checking folders under ", cwd
+            print "Checking folders under", cwd
             
             for dir,subFolders in folders.iteritems():
                 

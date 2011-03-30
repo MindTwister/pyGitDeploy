@@ -7,6 +7,10 @@ The script uses git to find changes since last deployment and applies the change
 
 New in version:
 -----
+### 0.5.1 ###
+* Better format for default values
+* Retains previously input values as default (except for password)
+
 ### 0.5 ###
 * Now actually saves remote information
 
@@ -44,3 +48,7 @@ Todo:
  * Named deployments should work as aliases for different servers; `git deploy staging` `git deploy production`
 * Bind a specific branch to a named deployment to merge config changes. (merge staging branch with current THEN upload)
 * Make the verbosity optional
+
+Thanks:
+-------
+    [Adeodato Simó](http://martirioenbenidorm.blogspot.com/) for [raw_input with editable default](http://chistera.yi.org/~dato/blog/entries/2008/02/14/python_raw_input_with_an_editable_default_value_using_readline.html)
