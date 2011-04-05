@@ -48,14 +48,12 @@ class Deploy:
     
     def checkFiles(self,deployVersion):
         
-        self.deployVersion = self.repo.commit(deployVersion).name_rev
+        self.deployVersion = self.repo.commit(deployVersion).name_rev.split(" ")[0]
         
         if self.configReader.has_option("ftp","lastDeploy"):
             lastDeploy = self.configReader.get_value("ftp","lastDeploy")
             changes = self.repo.commit(lastDeploy).diff(deployVersion)
         else:
-            lastDeploy = self.repo.head.reference.log_entry(0).newhexsha
-            changes = self.repo
             self.out("No previous deployments, adding all files",verbosity=0)
             for file in Git(self.repo.working_dir).ls_files().split("\n"):
                 self.out("  ",file,verbosity=4)
