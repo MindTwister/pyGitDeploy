@@ -51,7 +51,7 @@ class Deploy:
         if self.configReader.has_option("ftp","lastDeploy"):
             lastDeploy = self.configReader.get_value("ftp","lastDeploy")
         else:
-            lastDeploy = self.repo.head.reference.log()[0].newhexsha
+            lastDeploy = self.repo.head.reference.log_entry(0).newhexsha
             
         changes = self.repo.commit(lastDeploy).diff(deployVersion)
         
