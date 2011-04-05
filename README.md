@@ -8,6 +8,9 @@ The script uses git to find changes since last deployment and applies the change
 New in version:
 -----
 
+### 0.5.5.2 ###
+* Fixed an issue with binary files, all files are now treated as binary.
+
 ### 0.5.5.1 ###
 * Fixed a bloody stupid mistake when retrieving the hex of the current HEAD
 
