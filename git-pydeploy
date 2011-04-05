@@ -170,7 +170,11 @@ class Deploy:
                 
             if cwd == "/" + self.rootFolder:
                 self.ftp.cwd(cwd)
-    
+    def deleteFiles(self):
+        for file in self.deletedFiles:
+            self.out("Deleting ",file,verbosity=0)
+            if not self.dry:
+                self.ftp.delete(file)
         
     def uploadFiles(self):
         for file in self.updatedFiles:
@@ -227,6 +231,7 @@ if __name__ == "__main__":
     deploy.parseDirectories()
     deploy.connectFTP()
     deploy.checkDirectories()
+    deploy.deleteFiles()
     deploy.uploadFiles()
     
 

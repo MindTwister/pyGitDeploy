@@ -7,8 +7,13 @@ The script uses git to find changes since last deployment and applies the change
 
 New in version:
 -----
+
+### 0.5.5 ###
+* Now actually deletes the files
+* Updated the way the script handles no previous commits (grabs all files with `git ls-files`)
+
 ### 0.5.4 ###
-* Verbosity now a paramter
+* Verbosity now a parameter
 * Added -n or --dry-run for a simulated run (no upload, no directories created remotely)
 
 ### 0.5.3 ###
@@ -54,16 +59,15 @@ Tested environments:
 If you have used this script anywhere else with success feel free to send me a message and I will update this document.
 
 
-Todo:
+Todo for version 1:
 --------
 
-* Remove deleted files since last commit
 * Add active or passive mode to configuration options
 * Add `--revert` to quickly go back to last deployment
 * Add named deployments
  * Named deployments should work as aliases for different servers; `git deploy staging` `git deploy production`
 * Bind a specific branch to a named deployment to merge config changes. (merge staging branch with current THEN upload)
-* Verbosity levels
+* Verbosity levels (_work in progress_)
 * Document command line options
 
 Thanks:
