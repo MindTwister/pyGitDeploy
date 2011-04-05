@@ -43,10 +43,26 @@ Usage:
 Assuming python and this script is in your path:
 
     git pydeploy
+
+The script will prompt you for ftp details and start the deployment process.
     
 Advanced:
 
     git deploy [-v <level>| --verbose <level>] [-n | --dry-run] <commit>
+
+* **--dry-run**
+
+  **-n**
+
+ Runs the script without making any remote changes, only saves configuration and tells you what it would have don
+
+* **--verbose**
+
+ **-v**
+ 
+ Runs in verbose mode, the optional parameter specifies _how_ verbose it should be, 0-5
+  
+  
 
 When specifying which commit to deploy the script will still only compare to what is online and make the changes aka. diff works both ways.
 
