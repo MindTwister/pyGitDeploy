@@ -14,8 +14,9 @@ class Deploy:
     deletedFiles = []
     updatedFiles = []
     
-    def __init__(self):
-        self.verbose = False
+    def __init__(self,verbosity,dry):
+        self.verbose = verbosity
+        self.dry = dry
         self.repo = Repo("")
         self.configReader = self.repo.config_reader()
     
@@ -141,7 +142,7 @@ class Deploy:
                     
                 cwd = cwd[dir]
     
-    def checkDirectories(self,cwd = "",folders = {},dry=False):
+    def checkDirectories(self,cwd = "",folders = {}):
         if cwd == "":
             cwd = "/" + self.rootFolder
             folders = self.dirs
@@ -154,8 +155,8 @@ class Deploy:
                 try:
                     self.ftp.cwd(cwd + "/" + dir)
                 except:
-                    self.out("Creating previously non-existing folder", cwd + "/" + dir)
-                    if not dry:
+                    self.out("Creating previously non-existing folder", cwd + "/" + dir,verbosity=0)
+                    if not self.dry:
                         self.ftp.mkd(cwd + "/" + dir)
                 self.checkDirectories(cwd+"/"+dir,subFolders)
                 
@@ -163,13 +164,13 @@ class Deploy:
                 self.ftp.cwd(cwd)
     
         
-    def uploadFiles(self,dry=False):
+    def uploadFiles(self):
         for file in self.updatedFiles:
             self.out("Uploading",file,verbosity=0)
-            if not dry:
+            if not self.dry:
                 self.ftp.storbinary("STOR " + file,open(file,'r'))
         infoWriter = self.repo.config_writer()
-        if not dry:
+        if not self.dry:
             infoWriter.set_value('ftp','lastDeploy',self.repo.head.reference.log()[-1].newhexsha)
         infoWriter.set_value('ftp','remoteUser',self.remoteUser)
         infoWriter.set_value('ftp','remoteDir',self.remoteDir)
@@ -212,15 +213,12 @@ if __name__ == "__main__":
             args["verbose"] = value
     
     
-    deploy = Deploy()
-    
-    if args["verbose"]:
-        deploy.setVerbose(args["verbose"])
+    deploy = Deploy(args["verbose"],args["dry"])
             
     deploy.checkFiles(args["commit"])
     deploy.parseDirectories()
     deploy.connectFTP()
-    deploy.checkDirectories(args["dry"])
-    deploy.uploadFiles(args["dry"])
+    deploy.checkDirectories()
+    deploy.uploadFiles()
     
 
