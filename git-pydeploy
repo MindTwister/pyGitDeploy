@@ -48,12 +48,20 @@ class Deploy:
     
     def checkFiles(self,deployVersion):
         
+        self.deployVersion = self.repo.commit(deployVersion).name_rev
+        
         if self.configReader.has_option("ftp","lastDeploy"):
             lastDeploy = self.configReader.get_value("ftp","lastDeploy")
+            changes = self.repo.commit(lastDeploy).diff(deployVersion)
         else:
             lastDeploy = self.repo.head.reference.log_entry(0).newhexsha
-            
-        changes = self.repo.commit(lastDeploy).diff(deployVersion)
+            changes = self.repo
+            self.out("No previous deployments, adding all files",verbosity=0)
+            for file in Git(self.repo.working_dir).ls_files().split("\n"):
+                self.out("  ",file,verbosity=4)
+                self.updatedFiles.append(file)
+            return
+        
         
         self.out("Added files:")
         for fileAdded in changes.iter_change_type('A'):
@@ -171,7 +179,7 @@ class Deploy:
                 self.ftp.storbinary("STOR " + file,open(file,'r'))
         infoWriter = self.repo.config_writer()
         if not self.dry:
-            infoWriter.set_value('ftp','lastDeploy',self.repo.head.reference.log()[-1].newhexsha)
+            infoWriter.set_value('ftp','lastDeploy',self.deployVersion)
         infoWriter.set_value('ftp','remoteUser',self.remoteUser)
         infoWriter.set_value('ftp','remoteDir',self.remoteDir)
         infoWriter.set_value('ftp','remoteServer',self.remoteServer)
