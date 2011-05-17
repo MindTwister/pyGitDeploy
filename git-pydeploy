@@ -97,7 +97,7 @@ class Deploy:
         else:
             default = ""
             if rebuild_config:
-                default = self.remoteServer
+                default = self.remoteUser
             self.remoteUser = self.raw_input_default("Username: ",default)
         
         self.savePass = False
@@ -107,17 +107,18 @@ class Deploy:
             self.savePass = True
         else:
             self.remotePassword = getpass.getpass("Password: ")
-            if(self.configReader.has_option("ftp","savePass") == False):
-                if raw_input("Save password (y/n):").lower() == "y":
-                    self.savePass = True
         
         if self.configReader.has_option("ftp","remoteDir"):
             self.remoteDir = self.configReader.get_value("ftp","remoteDir")
         else:
             default = ""
             if rebuild_config:
-                default = self.remoteServer
-            self.remoteDir = self.raw_input_default("Remote directory: ","/")
+                default = self.remoteDir
+            self.remoteDir = self.raw_input_default("Remote directory: ",default)
+        
+        if(self.configReader.has_option("ftp","savePass") == False):
+                if raw_input("Save password (y/n):").lower() == "y":
+                    self.savePass = True
         
         while self.remoteDir.startswith("/"):
             self.remoteDir = self.remoteDir[1:]
