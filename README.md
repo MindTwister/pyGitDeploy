@@ -2,11 +2,14 @@ pyGitDeploy
 ===========
 
 A script for rapid deployment to FTP servers.
-The script uses git to find changes since last deployment and applies the changes to an FTP server, if no deployment has been made it uploads all watched files.
+The script uses git to find changes since last deployment and applies the changes to an FTP server, if no previous deployment has been made it uploads all watched files.
 
 
 New in version:
 -----
+
+### 0.5.5.3 ###
+* Default/previous values should now be presented correctly.
 
 ### 0.5.5.2 ###
 * Fixed an issue with binary files, all files are now treated as binary.
