@@ -116,7 +116,7 @@ class Deploy:
                 default = self.remoteDir
             self.remoteDir = self.raw_input_default("Remote directory: ",default)
         
-        if(self.configReader.has_option("ftp","savePass") == False):
+        if(self.configReader.has_option("ftp","savePass") == False and not self.configReader.has_option("ftp","remotePassword")):
                 if raw_input("Save password (y/n):").lower() == "y":
                     self.savePass = True
         
