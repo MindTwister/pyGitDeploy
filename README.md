@@ -70,7 +70,7 @@ Advanced:
   
   
 
-When specifying which commit to deploy the script will still only compare to what is online and make the changes aka. diff works both ways.
+When specifying a commit this is the commit that will be used to compare with the current commit. See this as a way to override the internally remembered last successful deployment.
 
 
 Tested environments:
