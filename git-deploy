@@ -14,10 +14,10 @@ class Deploy:
     deletedFiles = []
     updatedFiles = []
     
-    def __init__(self,verbosity,dry):
+    def __init__(self,verbosity=0,dry=False,path=""):
         self.verbose = verbosity
         self.dry = dry
-        self.repo = Repo("")
+        self.repo = Repo(path)
         os.chdir(self.repo.working_dir)
         self.configReader = self.repo.config_reader()
     
@@ -225,7 +225,7 @@ if __name__ == "__main__":
             args["verbose"] = value
     
     
-    deploy = Deploy(args["verbose"],args["dry"])
+    deploy = Deploy(path=os.getcwd(),verbosity=args["verbose"],dry=args["dry"])
             
     deploy.checkFiles(args["commit"])
     deploy.parseDirectories()
