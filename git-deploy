@@ -182,7 +182,7 @@ class Deploy:
     def uploadFiles(self):
         for file in self.updatedFiles:
             self.out("Uploading",file,verbosity=0)
-            if not self.dry:
+            if not self.dry and os.path.isfile(file):
                 self.ftp.storbinary("STOR " + file,open(file,'rb'))
         infoWriter = self.repo.config_writer()
         if not self.dry:
