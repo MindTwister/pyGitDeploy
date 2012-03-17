@@ -184,9 +184,37 @@ class Deploy:
             self.out("Uploading",file,verbosity=0)
             if not self.dry and os.path.isfile(file):
                 self.ftp.storbinary("STOR " + file,open(file,'rb'))
+            elif not self.dry and os.path.isdir(file):
+                try:
+                    self.ftp.mkd(file)
+                except:
+                    pass #sumodule folder allready exists
+
+    def handleSubmodules(self):
+        base = os.getcwd()
+        for subModule in self.repo.submodules:
+            path = os.path.join(base,subModule.path)
+            dep = Deploy(verbosity=self.verbose,dry=self.dry,path=path)
+            dep.ftp = self.ftp
+            dep.rootFolder = self.rootFolder + '/' + subModule.path
+            dep.checkFiles(args["commit"])
+            dep.parseDirectories()
+            dep.checkDirectories()
+            dep.deleteFiles()
+            dep.uploadFiles()
+            dep.updateLast()
+            try:
+                dep.handleSubmodules()
+            except:
+                pass
+
+    def updateLast(self):
         infoWriter = self.repo.config_writer()
         if not self.dry:
             infoWriter.set_value('ftp','lastDeploy',self.deployVersion)
+
+    def saveConfig(self):
+        infoWriter = self.repo.config_writer()
         infoWriter.set_value('ftp','remoteUser',self.remoteUser)
         infoWriter.set_value('ftp','remoteDir',self.remoteDir)
         infoWriter.set_value('ftp','remoteServer',self.remoteServer)
@@ -226,6 +254,7 @@ if __name__ == "__main__":
             if value == "":
                 value = 5
             args["verbose"] = value
+
     
     
     deploy = Deploy(path=os.getcwd(),verbosity=args["verbose"],dry=args["dry"])
@@ -236,4 +265,7 @@ if __name__ == "__main__":
     deploy.checkDirectories()
     deploy.deleteFiles()
     deploy.uploadFiles()
+    deploy.saveConfig()
+    deploy.updateLast()
+    deploy.handleSubmodules()
     
