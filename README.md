@@ -8,6 +8,9 @@ The script uses git to find changes since last deployment and applies the change
 New in version:
 -----
 
+### 0.5.6 ###
+* Now handles submodules
+
 ### 0.5.5.4 ###
 * Fix bug #4 "Crashes when not run from repo root"
 
