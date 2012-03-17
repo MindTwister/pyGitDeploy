@@ -36,11 +36,20 @@ Requirements:
 * [Python](http://www.python.org/)
 * [GitPython](http://packages.python.org/GitPython/0.3.1/index.html)
 
+Installation:
+-------------
+### Windows ###
+* Place git-deploy somewhere in your path.
+
+### Linux ###
+* Place git-deploy somewhere in your path
+* Make the script excutable: `chmod 755 git-deploy`
+
 Usage:
 ------
 Assuming python and this script is in your path:
 
-    git pydeploy
+    git deploy
 
 The script will prompt you for ftp details and start the deployment process.
     
