@@ -60,7 +60,7 @@ Advanced:
 
   **-n**
 
- Runs the script without making any remote changes, only saves configuration and tells you what it would have don
+ Runs the script without making any remote changes, only saves configuration and tells you what it would have done
 
 * **--verbose**
 
@@ -77,6 +77,10 @@ Tested environments:
 --------------------
 ### Windows versions: ###
 * Windows 7
+
+### Linux versions: ###
+* Mint 11-12
+* Ubuntu 10+
 
 ### Python versions: ###
 * 2.7.1
