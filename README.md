@@ -8,30 +8,19 @@ The script uses git to find changes since last deployment and applies the change
 New in version:
 -----
 
-### 0.5.5.3 ###
+### 0.5.5.4 ###
+* Fix bug #4 "Crashes when not run from repo root"
+
+### 0.5.1 - 0.5.5.3 ###
 * Default/previous values should now be presented correctly.
-
-### 0.5.5.2 ###
 * Fixed an issue with binary files, all files are now treated as binary.
-
-### 0.5.5.1 ###
 * Fixed a bloody stupid mistake when retrieving the hex of the current HEAD
-
-### 0.5.5 ###
 * Now actually deletes the files
 * Updated the way the script handles no previous commits (grabs all files with `git ls-files`)
-
-### 0.5.4 ###
 * Verbosity now a parameter
 * Added -n or --dry-run for a simulated run (no upload, no directories created remotely)
-
-### 0.5.3 ###
 * More verbosity
-
-### 0.5.2 ###
 * Made it possible to specify a specific state to deploy (in preperation for `git deploy --revert`)
-
-### 0.5.1 ###
 * Better format for default values
 * Retains previously input values as default (except for password)
 
