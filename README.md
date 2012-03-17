@@ -5,6 +5,11 @@ A script for rapid deployment to FTP servers.
 The script uses git to find changes since last deployment and applies the changes to an FTP server, if no previous deployment has been made it uploads all watched files.
 
 
+Rationale
+-----
+Most shared hosting environments dont allow ssh, let alone git. To make sure all relevant changes are uploaded when your project reaches its next iteration this script runs a diff between your last deployment and current HEAD then syncs those changes with an FTP server.
+
+
 New in version:
 -----
 
