@@ -174,7 +174,10 @@ class Deploy:
         for file in self.deletedFiles:
             self.out("Deleting ",file,verbosity=0)
             if not self.dry:
-                self.ftp.delete(file)
+                try:
+                    self.ftp.delete(file)
+                except:
+                    self.out("Error: ",file," did not exist online, could have been deletet by other means",verbosity=0)
         
     def uploadFiles(self):
         for file in self.updatedFiles:
