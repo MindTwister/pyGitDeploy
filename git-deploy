@@ -11,10 +11,11 @@ except ImportError:
     gotReadline = False
 
 class Deploy:
-    deletedFiles = []
-    updatedFiles = []
+    
     
     def __init__(self,verbosity=0,dry=False,path=""):
+        self.deletedFiles = []
+        self.updatedFiles = []
         self.verbose = verbosity
         self.dry = dry
         self.repo = Repo(path)
