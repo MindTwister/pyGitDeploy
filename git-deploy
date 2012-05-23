@@ -1,7 +1,11 @@
 #!/usr/bin/env python
 from __future__ import print_function
 from git import *
-import sys,getpass,ftplib,getopt,os
+import sys
+import getpass
+import ftplib
+import getopt
+import os
 
 #readline is not available on windows
 try:
@@ -10,10 +14,10 @@ try:
 except ImportError:
     gotReadline = False
 
+
 class Deploy:
-    
-    
-    def __init__(self,verbosity=0,dry=False,path=""):
+
+    def __init__(self, verbosity=0, dry=False, path=""):
         self.deletedFiles = []
         self.updatedFiles = []
         self.verbose = verbosity
@@ -21,17 +25,17 @@ class Deploy:
         self.repo = Repo(path)
         os.chdir(self.repo.working_dir)
         self.configReader = self.repo.config_reader()
-    
-    def setVerbose(self,verbose):
+
+    def setVerbose(self, verbose):
         self.verbose = verbose
-    
+
     #raw_input with editable default values
-    def raw_input_default(self,prompt, default):
+    def raw_input_default(self, prompt, default):
         if gotReadline:
             def pre_input_hook():
                 readline.insert_text(default)
                 readline.redisplay()
-      
+
             readline.set_pre_input_hook(pre_input_hook)
             try:
                 return raw_input(prompt)
@@ -41,105 +45,101 @@ class Deploy:
             #No readline :(
             if(default != ""):
                 prompt = "[" + default + "] " + prompt
-            
+
             val = raw_input(prompt)
             if val == "":
                 val = default
             return val
-    
-    
-    def checkFiles(self,deployVersion):
-        
+
+    def checkFiles(self, deployVersion):
+
         self.deployVersion = self.repo.commit(deployVersion).name_rev.split(" ")[0]
-        
-        if self.configReader.has_option("ftp","lastDeploy"):
-            lastDeploy = self.configReader.get_value("ftp","lastDeploy")
+
+        if self.configReader.has_option("ftp", "lastDeploy"):
+            lastDeploy = self.configReader.get_value("ftp", "lastDeploy")
             changes = self.repo.commit(lastDeploy).diff(deployVersion)
         else:
-            self.out("No previous deployments, adding all files",verbosity=0)
+            self.out("No previous deployments, adding all files", verbosity=0)
             for file in Git(self.repo.working_dir).ls_files().split("\n"):
-                self.out("  ",file,verbosity=4)
+                self.out("  ", file, verbosity=4)
                 self.updatedFiles.append(file)
             return
-        
-        
+
         self.out("Added files:")
         for fileAdded in changes.iter_change_type('A'):
-            self.out("  ",fileAdded.b_blob.path)
+            self.out("  ", fileAdded.b_blob.path)
             self.updatedFiles.append(fileAdded.b_blob.path)
-        
+
         self.out("Updated files")
         for fileUpdated in changes.iter_change_type('M'):
-            self.out("  ",fileUpdated.a_blob.path)
+            self.out("  ", fileUpdated.a_blob.path)
             self.updatedFiles.append(fileUpdated.a_blob.path)
-        
+
         self.out("Deleted files")
         for fileDeleted in changes.iter_change_type('D'):
-            self.out("  ",fileDeleted.a_blob.path)
+            self.out("  ", fileDeleted.a_blob.path)
             self.deletedFiles.append(fileDeleted.a_blob.path)
-        
+
         self.out("Renamed files")
         for fileRenamed in changes.iter_change_type('R'):
-            self.out("  From: ",fileRenamed.a_blob.path, " to ", fileRenamed.b_blob.path)
+            self.out("  From: ", fileRenamed.a_blob.path, " to ", fileRenamed.b_blob.path)
 
-    
-    def connectFTP(self,rebuild_config=False):
-        
-        if self.configReader.has_option("ftp","remoteServer"):
-            self.remoteServer = self.configReader.get_value("ftp","remoteServer")
+    def connectFTP(self, rebuild_config=False):
+
+        if self.configReader.has_option("ftp", "remoteServer"):
+            self.remoteServer = self.configReader.get_value("ftp", "remoteServer")
         else:
             default = ""
             if rebuild_config:
                 default = self.remoteServer
-            self.remoteServer = self.raw_input_default("Server: ",default)
-        
-        
-        if self.configReader.has_option("ftp","remoteUser"):
-            self.remoteUser = self.configReader.get_value("ftp","remoteUser")
+            self.remoteServer = self.raw_input_default("Server: ", default)
+
+        if self.configReader.has_option("ftp", "remoteUser"):
+            self.remoteUser = self.configReader.get_value("ftp", "remoteUser")
         else:
             default = ""
             if rebuild_config:
                 default = self.remoteUser
-            self.remoteUser = self.raw_input_default("Username: ",default)
-        
+            self.remoteUser = self.raw_input_default("Username: ", default)
+
         self.savePass = False
-        
-        if self.configReader.has_option("ftp","remotePassword"):
-            self.remotePassword = self.configReader.get_value("ftp","remotePassword")
+
+        if self.configReader.has_option("ftp", "remotePassword"):
+            self.remotePassword = self.configReader.get_value("ftp", "remotePassword")
             self.savePass = True
         else:
             self.remotePassword = getpass.getpass("Password: ")
-        
-        if self.configReader.has_option("ftp","remoteDir"):
-            self.remoteDir = self.configReader.get_value("ftp","remoteDir")
+
+        if self.configReader.has_option("ftp", "remoteDir"):
+            self.remoteDir = self.configReader.get_value("ftp", "remoteDir")
         else:
             default = ""
             if rebuild_config:
                 default = self.remoteDir
-            self.remoteDir = self.raw_input_default("Remote directory: ",default)
-        
-        if(self.configReader.has_option("ftp","savePass") == False and not self.configReader.has_option("ftp","remotePassword")):
+            self.remoteDir = self.raw_input_default("Remote directory: ", default)
+
+        if(self.configReader.has_option("ftp", "savePass") == False and not self.configReader.has_option("ftp", "remotePassword")):
                 if raw_input("Save password (y/n):").lower() == "y":
                     self.savePass = True
-        
+
         while self.remoteDir.startswith("/"):
             self.remoteDir = self.remoteDir[1:]
-        
+
         while self.remoteDir.endswith("/"):
             self.remoteDir = self.remoteDir[:-1]
-        
+
         try:
-            self.ftp = ftplib.FTP(self.remoteServer,self.remoteUser,self.remotePassword)
+            self.ftp = ftplib.FTP(self.remoteServer, self.remoteUser, self.remotePassword)
             self.ftp.cwd("/" + self.remoteDir)
         except ftplib.all_errors as connectionError:
-            self.out("Error connecting to server: ", connectionError,verbosity=0)
+            self.out("Error connecting to server: ", connectionError, verbosity=0)
             if raw_input("Retry (y/n)?: ").lower() == "y":
                 self.connectFTP(True)
             else:
                 exit(255)
-                
-        self.rootFolder =  self.remoteDir
-    
+
+        self.rootFolder = self.remoteDir
+
     def parseDirectories(self):
         self.dirs = {}
         for file in self.updatedFiles:
@@ -148,54 +148,56 @@ class Deploy:
             for dir in dirs:
                 if dir not in cwd:
                     cwd[dir] = {}
-                    
+
                 cwd = cwd[dir]
-    
-    def checkDirectories(self,cwd = "",folders = {}):
+
+    def checkDirectories(self, cwd="", folders={}):
         if cwd == "":
             cwd = "/" + self.rootFolder
             folders = self.dirs
         if self.ftp:
             self.out("Checking folders under", cwd)
-            
-            for dir,subFolders in folders.iteritems():
-                
+
+            for dir, subFolders in folders.iteritems():
+
                 self.out("Checking ", cwd + "/" + dir)
                 try:
                     self.ftp.cwd(cwd + "/" + dir)
                 except:
-                    self.out("Creating previously non-existing folder", cwd + "/" + dir,verbosity=0)
+                    self.out("Creating previously non-existing folder", cwd + "/" + dir, verbosity=0)
                     if not self.dry:
                         self.ftp.mkd(cwd + "/" + dir)
-                self.checkDirectories(cwd+"/"+dir,subFolders)
-                
+                self.checkDirectories(cwd + "/" + dir, subFolders)
+
             if cwd == "/" + self.rootFolder:
                 self.ftp.cwd(cwd)
+
     def deleteFiles(self):
         for file in self.deletedFiles:
-            self.out("Deleting ",file,verbosity=0)
+            self.out("Deleting ", file, verbosity=0)
             if not self.dry:
                 try:
                     self.ftp.delete(file)
                 except:
-                    self.out("Error: ",file," did not exist online, could have been deletet by other means",verbosity=0)
-        
+                    self.out("Error: ", file, " did not exist online, could have been deletet by other means", verbosity=0)
+
     def uploadFiles(self):
         for file in self.updatedFiles:
-            self.out("Uploading",file,verbosity=0)
+            self.out("Uploading", file, verbosity=0)
             if not self.dry and os.path.isfile(file):
-                self.ftp.storbinary("STOR " + file,open(file,'rb'))
+                self.ftp.storbinary("STOR " + file, open(file, 'rb'))
             elif not self.dry and os.path.isdir(file):
                 try:
                     self.ftp.mkd(file)
                 except:
-                    pass #sumodule folder allready exists
+                    #sumodule folder allready exists
+                    pass
 
     def handleSubmodules(self):
         base = os.getcwd()
         for subModule in self.repo.submodules:
-            path = os.path.join(base,subModule.path)
-            dep = Deploy(verbosity=self.verbose,dry=self.dry,path=path)
+            path = os.path.join(base, subModule.path)
+            dep = Deploy(verbosity=self.verbose, dry=self.dry, path=path)
             dep.ftp = self.ftp
             dep.rootFolder = self.rootFolder + '/' + subModule.path
             dep.checkFiles(args["commit"])
@@ -212,17 +214,17 @@ class Deploy:
     def updateLast(self):
         infoWriter = self.repo.config_writer()
         if not self.dry:
-            infoWriter.set_value('ftp','lastDeploy',self.deployVersion)
+            infoWriter.set_value('ftp', 'lastDeploy', self.deployVersion)
 
     def saveConfig(self):
         infoWriter = self.repo.config_writer()
-        infoWriter.set_value('ftp','remoteUser',self.remoteUser)
-        infoWriter.set_value('ftp','remoteDir',self.remoteDir)
-        infoWriter.set_value('ftp','remoteServer',self.remoteServer)
+        infoWriter.set_value('ftp', 'remoteUser', self.remoteUser)
+        infoWriter.set_value('ftp', 'remoteDir', self.remoteDir)
+        infoWriter.set_value('ftp', 'remoteServer', self.remoteServer)
         if self.savePass:
-            infoWriter.set_value('ftp','remotePassword',self.remotePassword)
-            
-    def out(self,*args,**kwargs):
+            infoWriter.set_value('ftp', 'remotePassword', self.remotePassword)
+
+    def out(self, *args, **kwargs):
         try:
             verbosity = kwargs["verbosity"]
         except:
@@ -230,36 +232,34 @@ class Deploy:
         if self.verbose >= verbosity:
             for a in args:
                 if a != "":
-                    print(a,end=" ")
+                    print(a, end=" ")
             print("")
 
 if __name__ == "__main__":
-    
+
     args = {
-        "dry" : False,
-        "commit" : "HEAD",
-        "verbose" : 1
+        "dry": False,
+        "commit": "HEAD",
+        "verbose": 1
     }
 
-    options, arguments = getopt.getopt(sys.argv[1:],"vn",["dry-run","verbose"])
+    options, arguments = getopt.getopt(sys.argv[1:], "vn", ["dry-run", "verbose"])
     if len(arguments):
         args["commit"] = arguments[0]
     else:
         args["commit"] = "HEAD"
-    
+
     for option, value in options:
         if option in ("-n", "--dry-run"):
             args["dry"] = True
-        
-        if option in ("-v","--verbose"):
+
+        if option in ("-v", "--verbose"):
             if value == "":
                 value = 5
             args["verbose"] = value
 
-    
-    
-    deploy = Deploy(path=os.getcwd(),verbosity=args["verbose"],dry=args["dry"])
-            
+    deploy = Deploy(path=os.getcwd(), verbosity=args["verbose"], dry=args["dry"])
+
     deploy.checkFiles(args["commit"])
     deploy.parseDirectories()
     deploy.connectFTP()
@@ -269,4 +269,3 @@ if __name__ == "__main__":
     deploy.saveConfig()
     deploy.updateLast()
     deploy.handleSubmodules()
-    
