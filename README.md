@@ -12,6 +12,9 @@ Most shared hosting environments dont allow ssh, let alone git. To make sure all
 
 New in version:
 -----
+### 0.6 ##
+* Major rewrite, now uses [Paver](https://github.com/paver/paver)
+* Documentation overhaul in the works using [Pycco](https://github.com/fitzgen/pycco)
 
 ### 0.5.6 ###
 * Now handles submodules
@@ -43,12 +46,9 @@ Requirements:
 
 Installation:
 -------------
-### Windows ###
-* Place git-deploy somewhere in your path.
+Clone the repo from github, then
 
-### Linux ###
-* Place git-deploy somewhere in your path
-* Make the script excutable: `chmod 755 git-deploy`
+	paver install
 
 Usage:
 ------

@@ -1,13 +1,19 @@
 #!/usr/bin/env python
+
+# Preliminaries
+# -------------
 from __future__ import print_function
+# [GitPython](http://packages.python.org/GitPython/0.3.1/reference.html)
 from git import *
-import sys
 import getpass
 import ftplib
-import getopt
+import sys
 import os
+import getopt
 
-#readline is not available on windows
+# Attempt to import readline, if available we will use that
+# [readline](http://docs.python.org/library/readline.html?highlight=readline#readline)
+# is not available outside of unix.
 try:
     import readline
     gotReadline = True
@@ -15,22 +21,28 @@ except ImportError:
     gotReadline = False
 
 
+# Deploy
+# ======
 class Deploy:
-
     def __init__(self, verbosity=0, dry=False, path=""):
         self.deletedFiles = []
         self.updatedFiles = []
         self.verbose = verbosity
         self.dry = dry
+        # Repo will first attempt to find .git in the cwd, then work its way up
         self.repo = Repo(path)
+        # We change dir to the repo working dir so file references we get from
+        # the repo makes sense.
         os.chdir(self.repo.working_dir)
         self.configReader = self.repo.config_reader()
 
     def setVerbose(self, verbose):
         self.verbose = verbose
 
-    #raw_input with editable default values
+    # Wrap raw_input/readline to show default values
     def raw_input_default(self, prompt, default):
+        # If we have readline, insert the default text after prompting
+        # this way the user can delete the default and replace it
         if gotReadline:
             def pre_input_hook():
                 readline.insert_text(default)
@@ -41,8 +53,10 @@ class Deploy:
                 return raw_input(prompt)
             finally:
                 readline.set_pre_input_hook(None)
+        # If we do not have readline, prompt for text with the default
+        # value placed in square braces imediately behind it. If we get
+        # an empty string back, set the returned value to the default
         else:
-            #No readline :(
             if(default != ""):
                 prompt = "[" + default + "] " + prompt
 
@@ -235,7 +249,8 @@ class Deploy:
                     print(a, end=" ")
             print("")
 
-if __name__ == "__main__":
+
+def main():
 
     args = {
         "dry": False,
@@ -269,3 +284,7 @@ if __name__ == "__main__":
     deploy.saveConfig()
     deploy.updateLast()
     deploy.handleSubmodules()
+
+__all__ = ("Deploy", "main")
+if __name__ == "__main__":
+    main()
