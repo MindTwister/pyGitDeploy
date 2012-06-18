@@ -65,20 +65,27 @@ class Deploy:
                 val = default
             return val
 
+    # Use git to check for files changed since last deploy.
     def checkFiles(self, deployVersion):
 
         self.deployVersion = self.repo.commit(deployVersion).name_rev.split(" ")[0]
 
+        # Check the config and see if a last deployment exists
         if self.configReader.has_option("ftp", "lastDeploy"):
             lastDeploy = self.configReader.get_value("ftp", "lastDeploy")
+            # Create a diff of changes between last deploy and current HEAD
             changes = self.repo.commit(lastDeploy).diff(deployVersion)
+        # In case no previous deployments exists
         else:
             self.out("No previous deployments, adding all files", verbosity=0)
+            # Grab all files in the repo
             for file in Git(self.repo.working_dir).ls_files().split("\n"):
                 self.out("  ", file, verbosity=4)
                 self.updatedFiles.append(file)
             return
 
+        # Iterate through all changes, using [iter_change_type](http://packages.python.org/GitPython/0.3.1/reference.html#git.diff.DiffIndex)
+        # to keep track of whats what
         self.out("Added files:")
         for fileAdded in changes.iter_change_type('A'):
             self.out("  ", fileAdded.b_blob.path)
@@ -98,8 +105,12 @@ class Deploy:
         for fileRenamed in changes.iter_change_type('R'):
             self.out("  From: ", fileRenamed.a_blob.path, " to ", fileRenamed.b_blob.path)
 
+    # Setup FTP settings
     def connectFTP(self, rebuild_config=False):
 
+        # The following checks the config file for already set values.
+        #
+        # If the value is not found the user will be prompted for information.
         if self.configReader.has_option("ftp", "remoteServer"):
             self.remoteServer = self.configReader.get_value("ftp", "remoteServer")
         else:
@@ -136,12 +147,16 @@ class Deploy:
                 if raw_input("Save password (y/n):").lower() == "y":
                     self.savePass = True
 
+        # Trim the remote dir of slashes the first slash will be prepended by the system.
+        # This means that all remote directories must be absolute.
         while self.remoteDir.startswith("/"):
             self.remoteDir = self.remoteDir[1:]
 
         while self.remoteDir.endswith("/"):
             self.remoteDir = self.remoteDir[:-1]
 
+        # Attempt to connect to the remote ftp server and change directory to the specified
+        # remote folder.
         try:
             self.ftp = ftplib.FTP(self.remoteServer, self.remoteUser, self.remotePassword)
             self.ftp.cwd("/" + self.remoteDir)
@@ -154,8 +169,10 @@ class Deploy:
 
         self.rootFolder = self.remoteDir
 
+    # Parse folders from the changed files
     def parseDirectories(self):
         self.dirs = {}
+        # Run through each updated file and generate a dictionary tree of expected remote folders
         for file in self.updatedFiles:
             dirs = file.split('/')[:-1]
             cwd = self.dirs
@@ -165,7 +182,9 @@ class Deploy:
 
                 cwd = cwd[dir]
 
+    # Check remote for expected folders
     def checkDirectories(self, cwd="", folders={}):
+        # Instead of keeping track of nesting levels etc, we use absolute paths on the remote server.
         if cwd == "":
             cwd = "/" + self.rootFolder
             folders = self.dirs
@@ -173,19 +192,21 @@ class Deploy:
             self.out("Checking folders under", cwd)
 
             for dir, subFolders in folders.iteritems():
-
                 self.out("Checking ", cwd + "/" + dir)
+                # To test for the remote directory we use the tried and tested "better to ask forgiveness"
                 try:
                     self.ftp.cwd(cwd + "/" + dir)
                 except:
                     self.out("Creating previously non-existing folder", cwd + "/" + dir, verbosity=0)
                     if not self.dry:
                         self.ftp.mkd(cwd + "/" + dir)
+                # Recursively check the sub-folders of the current folder
                 self.checkDirectories(cwd + "/" + dir, subFolders)
 
             if cwd == "/" + self.rootFolder:
                 self.ftp.cwd(cwd)
 
+    # Delete remote files if they have been deleted from the repository
     def deleteFiles(self):
         for file in self.deletedFiles:
             self.out("Deleting ", file, verbosity=0)
@@ -195,6 +216,7 @@ class Deploy:
                 except:
                     self.out("Error: ", file, " did not exist online, could have been deletet by other means", verbosity=0)
 
+    # Upload local files to remote
     def uploadFiles(self):
         for file in self.updatedFiles:
             self.out("Uploading", file, verbosity=0)
