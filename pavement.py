@@ -1,5 +1,6 @@
 from paver.easy import *
 from paver.setuputils import setup
+import os
 
 setup(
     name="pyGitDeploy",
@@ -14,3 +15,24 @@ setup(
     },
     install_requires=["gitpython"]
     )
+
+
+@task
+@needs('generate_setup', 'minilib', 'docs')
+def prepare():
+    """Prepares the project for commit/install"""
+    pass
+
+
+@task
+def docs():
+    """Generates the project documentation"""
+    os.system("pycco deploy/deploy.py")
+
+
+@task
+def clean():
+    """Clean all build files"""
+    sh("rm -rf docs")
+    sh("rm -rf pyGitDeploy.egg-info")
+    sh("rm -rf build")
