@@ -12,7 +12,13 @@ Most shared hosting environments dont allow ssh, let alone git. To make sure all
 
 New in version:
 -----
-### 0.6 ##
+### 0.6.1 ###
+* Deploying using a diff from a specific commit was not as useful as hoped, instead you can supply a named target
+* Config has been moved outside of the git folder and into the repo root
+*	Config now has a `global` section
+	*	Global section has an `ignore` option, this takes the form of a list of files to ignore for upload
+
+### 0.6 ###
 * Major rewrite, now uses [Paver](https://github.com/paver/paver)
 * Documentation overhaul in the works using [Pycco](https://github.com/fitzgen/pycco)
 
@@ -50,6 +56,10 @@ Clone the repo from github, then
 
 	paver install
 
+Or
+
+	python setup.py install
+
 Usage:
 ------
 Assuming python and this script is in your path:
@@ -60,7 +70,7 @@ The script will prompt you for ftp details and start the deployment process.
     
 Advanced:
 
-    git deploy [-v <level>| --verbose <level>] [-n | --dry-run] <commit>
+    git deploy [-v <level>| --verbose <level>] [-n | --dry-run] <target>
 
 * **--dry-run**
 
@@ -76,8 +86,7 @@ Advanced:
   
   
 
-When specifying a commit this is the commit that will be used to compare with the current commit. See this as a way to override the internally remembered last successful deployment.
-
+Target is a named target server, the config file will keep track of individual targets and deployments
 
 Tested environments:
 --------------------
@@ -95,12 +104,10 @@ If you have used this script anywhere else with success feel free to send me a m
 
 
 Todo for version 1:
---------
+-------------------
 
 * Add active or passive mode to configuration options
 * Add `--revert` to quickly go back to last deployment
-* Add named deployments
- * Named deployments should work as aliases for different servers; `git deploy staging` `git deploy production`
 * Bind a specific branch to a named deployment to merge config changes. (merge staging branch with current THEN upload)
 * Verbosity levels (_work in progress_)
 * Document command line options
