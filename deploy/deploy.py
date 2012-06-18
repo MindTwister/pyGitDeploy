@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # Preliminaries
 # -------------
 from __future__ import print_function
