@@ -10,6 +10,7 @@ import ftplib
 import sys
 import os
 import getopt
+from .config import *
 
 # Attempt to import readline, if available we will use that
 # [readline](http://docs.python.org/library/readline.html?highlight=readline#readline)
@@ -34,7 +35,7 @@ class Deploy:
         # We change dir to the repo working dir so file references we get from
         # the repo makes sense.
         os.chdir(self.repo.working_dir)
-        self.configReader = self.repo.config_reader()
+        self.configReader = ConfigReader()
 
     def setVerbose(self, verbose):
         self.verbose = verbose
@@ -248,12 +249,12 @@ class Deploy:
                 pass
 
     def updateLast(self):
-        infoWriter = self.repo.config_writer()
+        infoWriter = ConfigWriter()
         if not self.dry:
             infoWriter.set_value('ftp', 'lastDeploy', self.deployVersion)
 
     def saveConfig(self):
-        infoWriter = self.repo.config_writer()
+        infoWriter = ConfigWriter()
         infoWriter.set_value('ftp', 'remoteUser', self.remoteUser)
         infoWriter.set_value('ftp', 'remoteDir', self.remoteDir)
         infoWriter.set_value('ftp', 'remoteServer', self.remoteServer)

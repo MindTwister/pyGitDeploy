@@ -27,7 +27,7 @@ def prepare():
 @task
 def docs():
     """Generates the project documentation"""
-    os.system("pycco deploy/deploy.py")
+    os.system("pycco deploy/*.py")
 
 
 @task
