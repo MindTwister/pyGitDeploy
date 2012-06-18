@@ -18,7 +18,7 @@ setup(
 
 
 @task
-@needs('clean', 'minilib', 'docs')
+@needs('minilib', 'docs')
 def prepare():
     """Prepares the project for commit/install"""
     pass
