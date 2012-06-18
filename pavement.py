@@ -5,7 +5,7 @@ import os
 setup(
     name="pyGitDeploy",
     packages=["deploy"],
-    version="0.6",
+    version="0.6.1",
     url="https://github.com/MindTwister/pyGitDeploy",
     author="Kristoffer Sall Hansen",
     author_email="kristoffer@sallhansen.dk",
@@ -18,7 +18,7 @@ setup(
 
 
 @task
-@needs('generate_setup', 'minilib', 'docs')
+@needs('clean', 'minilib', 'docs')
 def prepare():
     """Prepares the project for commit/install"""
     pass
@@ -42,3 +42,5 @@ def clean():
     sh("rm -rf docs")
     sh("rm -rf pyGitDeploy.egg-info")
     sh("rm -rf build")
+    sh("rm -rf setup.py")
+    sh("rm -rf paver-minilib.zip")
