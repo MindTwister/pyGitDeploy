@@ -8,6 +8,8 @@ import ftplib
 import sys
 import os
 import getopt
+import json
+# See [[config]]
 from .config import *
 
 # Attempt to import readline, if available we will use that
@@ -23,20 +25,29 @@ except ImportError:
 # Deploy
 # ======
 class Deploy:
-    def __init__(self, verbosity=0, dry=False, path=""):
+    def __init__(self, verbosity=0, dry=False, path="", target=""):
         self.deletedFiles = []
         self.updatedFiles = []
         self.verbose = verbosity
         self.dry = dry
+        self.target = target
         # Repo will first attempt to find .git in the cwd, then work its way up
         self.repo = Repo(path)
         # We change dir to the repo working dir so file references we get from
         # the repo makes sense.
         os.chdir(self.repo.working_dir)
-        self.configReader = ConfigReader()
+        self.configReader = ConfigReader(target)
+        self.configGlobal = ConfigReader()
+        self.ignored = []
+        if self.configGlobal.has_option("global", "ignore"):
+            self.ignored = json.loads(self.configGlobal.get_value("global", "ignore"))
+        self.ignored.append("deploy.cfg")
 
     def setVerbose(self, verbose):
         self.verbose = verbose
+
+    def is_ignored(self, file):
+        return (file in self.ignored)
 
     # Wrap raw_input/readline to show default values
     def raw_input_default(self, prompt, default):
@@ -79,6 +90,8 @@ class Deploy:
             self.out("No previous deployments, adding all files", verbosity=0)
             # Grab all files in the repo
             for file in Git(self.repo.working_dir).ls_files().split("\n"):
+                if self.is_ignored(file):
+                    continue
                 self.out("  ", file, verbosity=4)
                 self.updatedFiles.append(file)
             return
@@ -87,11 +100,17 @@ class Deploy:
         # to keep track of whats what
         self.out("Added files:")
         for fileAdded in changes.iter_change_type('A'):
+            if self.is_ignored(fileAdded.b_blob.path):
+                self.out("File:", fileAdded.b_blob.path, "is ignored")
+                continue
             self.out("  ", fileAdded.b_blob.path)
             self.updatedFiles.append(fileAdded.b_blob.path)
 
         self.out("Updated files")
         for fileUpdated in changes.iter_change_type('M'):
+            if self.is_ignored(fileUpdated.b_blob.path):
+                self.out("File:", fileUpdated.b_blob.path, "is ignored")
+                continue
             self.out("  ", fileUpdated.a_blob.path)
             self.updatedFiles.append(fileUpdated.a_blob.path)
 
@@ -103,6 +122,7 @@ class Deploy:
         self.out("Renamed files")
         for fileRenamed in changes.iter_change_type('R'):
             self.out("  From: ", fileRenamed.a_blob.path, " to ", fileRenamed.b_blob.path)
+
 
     # Setup FTP settings
     def connectFTP(self, rebuild_config=False):
@@ -247,12 +267,12 @@ class Deploy:
                 pass
 
     def updateLast(self):
-        infoWriter = ConfigWriter()
+        infoWriter = ConfigWriter(self.target)
         if not self.dry:
             infoWriter.set_value('ftp', 'lastDeploy', self.deployVersion)
 
     def saveConfig(self):
-        infoWriter = ConfigWriter()
+        infoWriter = ConfigWriter(self.target)
         infoWriter.set_value('ftp', 'remoteUser', self.remoteUser)
         infoWriter.set_value('ftp', 'remoteDir', self.remoteDir)
         infoWriter.set_value('ftp', 'remoteServer', self.remoteServer)
@@ -281,9 +301,9 @@ def main():
 
     options, arguments = getopt.getopt(sys.argv[1:], "vn", ["dry-run", "verbose"])
     if len(arguments):
-        args["commit"] = arguments[0]
+        args["target"] = arguments[0]
     else:
-        args["commit"] = "HEAD"
+        args["target"] = ""
 
     for option, value in options:
         if option in ("-n", "--dry-run"):
@@ -294,9 +314,9 @@ def main():
                 value = 5
             args["verbose"] = value
 
-    deploy = Deploy(path=os.getcwd(), verbosity=args["verbose"], dry=args["dry"])
+    deploy = Deploy(path=os.getcwd(), verbosity=args["verbose"], dry=args["dry"], target=args["target"])
 
-    deploy.checkFiles(args["commit"])
+    deploy.checkFiles("HEAD")
     deploy.parseDirectories()
     deploy.connectFTP()
     deploy.checkDirectories()

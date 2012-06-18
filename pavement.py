@@ -25,6 +25,12 @@ def prepare():
 
 
 @task
+@needs('prepare', 'distutils.command.install')
+def install():
+    pass
+
+
+@task
 def docs():
     """Generates the project documentation"""
     os.system("pycco deploy/*.py")
