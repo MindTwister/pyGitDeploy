@@ -17,18 +17,6 @@
       <div class='octowrap'>
         <a class='octothorpe' href='#section-0'>#</a>
       </div>
-      
-    </div>
-    <div class='code'>
-      <div class="highlight"><pre></pre></div>
-    </div>
-  </div>
-  <div class='clearall'></div>
-  <div class='section' id='section-1'>
-    <div class='docs'>
-      <div class='octowrap'>
-        <a class='octothorpe' href='#section-1'>#</a>
-      </div>
       <h2>Preliminaries</h2>
     </div>
     <div class='code'>
@@ -36,10 +24,10 @@
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-2'>
+  <div class='section' id='section-1'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-2'>#</a>
+        <a class='octothorpe' href='#section-1'>#</a>
       </div>
       <p><a href="http://packages.python.org/GitPython/0.3.1/reference.html">GitPython</a></p>
     </div>
@@ -49,14 +37,15 @@
 <span class="kn">import</span> <span class="nn">ftplib</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">getopt</span></pre></div>
+<span class="kn">import</span> <span class="nn">getopt</span>
+<span class="kn">from</span> <span class="nn">.config</span> <span class="kn">import</span> <span class="o">*</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-3'>
+  <div class='section' id='section-2'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-3'>#</a>
+        <a class='octothorpe' href='#section-2'>#</a>
       </div>
       <p>Attempt to import readline, if available we will use that
 <a href="http://docs.python.org/library/readline.html?highlight=readline#readline">readline</a>
@@ -71,10 +60,10 @@ is not available outside of unix.</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-4'>
+  <div class='section' id='section-3'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-4'>#</a>
+        <a class='octothorpe' href='#section-3'>#</a>
       </div>
       <h1>Deploy</h1>
     </div>
@@ -83,10 +72,10 @@ is not available outside of unix.</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-5'>
+  <div class='section' id='section-4'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-5'>#</a>
+        <a class='octothorpe' href='#section-4'>#</a>
       </div>
       
     </div>
@@ -99,10 +88,10 @@ is not available outside of unix.</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-6'>
+  <div class='section' id='section-5'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-6'>#</a>
+        <a class='octothorpe' href='#section-5'>#</a>
       </div>
       <p>Repo will first attempt to find .git in the cwd, then work its way up</p>
     </div>
@@ -111,24 +100,24 @@ is not available outside of unix.</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-7'>
+  <div class='section' id='section-6'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-7'>#</a>
+        <a class='octothorpe' href='#section-6'>#</a>
       </div>
       <p>We change dir to the repo working dir so file references we get from
 the repo makes sense.</p>
     </div>
     <div class='code'>
       <div class="highlight"><pre>        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">working_dir</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">configReader</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">config_reader</span><span class="p">()</span></pre></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">configReader</span> <span class="o">=</span> <span class="n">ConfigReader</span><span class="p">()</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-8'>
+  <div class='section' id='section-7'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-8'>#</a>
+        <a class='octothorpe' href='#section-7'>#</a>
       </div>
       
     </div>
@@ -138,10 +127,10 @@ the repo makes sense.</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-9'>
+  <div class='section' id='section-8'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-9'>#</a>
+        <a class='octothorpe' href='#section-8'>#</a>
       </div>
       <p>Wrap raw_input/readline to show default values</p>
     </div>
@@ -150,10 +139,10 @@ the repo makes sense.</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-10'>
+  <div class='section' id='section-9'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-10'>#</a>
+        <a class='octothorpe' href='#section-9'>#</a>
       </div>
       <p>If we have readline, insert the default text after prompting
 this way the user can delete the default and replace it</p>
@@ -163,10 +152,10 @@ this way the user can delete the default and replace it</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-11'>
+  <div class='section' id='section-10'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-11'>#</a>
+        <a class='octothorpe' href='#section-10'>#</a>
       </div>
       
     </div>
@@ -183,10 +172,10 @@ this way the user can delete the default and replace it</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-12'>
+  <div class='section' id='section-11'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-12'>#</a>
+        <a class='octothorpe' href='#section-11'>#</a>
       </div>
       <p>If we do not have readline, prompt for text with the default
 value placed in square braces imediately behind it. If we get
@@ -204,10 +193,10 @@ an empty string back, set the returned value to the default</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-13'>
+  <div class='section' id='section-12'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-13'>#</a>
+        <a class='octothorpe' href='#section-12'>#</a>
       </div>
       <p>Use git to check for files changed since last deploy.</p>
     </div>
@@ -218,10 +207,10 @@ an empty string back, set the returned value to the default</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-14'>
+  <div class='section' id='section-13'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-14'>#</a>
+        <a class='octothorpe' href='#section-13'>#</a>
       </div>
       <p>Check the config and see if a last deployment exists</p>
     </div>
@@ -231,10 +220,10 @@ an empty string back, set the returned value to the default</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-15'>
+  <div class='section' id='section-14'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-15'>#</a>
+        <a class='octothorpe' href='#section-14'>#</a>
       </div>
       <p>Create a diff of changes between last deploy and current HEAD</p>
     </div>
@@ -243,10 +232,10 @@ an empty string back, set the returned value to the default</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-16'>
+  <div class='section' id='section-15'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-16'>#</a>
+        <a class='octothorpe' href='#section-15'>#</a>
       </div>
       <p>In case no previous deployments exists</p>
     </div>
@@ -256,10 +245,10 @@ an empty string back, set the returned value to the default</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-17'>
+  <div class='section' id='section-16'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-17'>#</a>
+        <a class='octothorpe' href='#section-16'>#</a>
       </div>
       <p>Grab all files in the repo</p>
     </div>
@@ -271,10 +260,10 @@ an empty string back, set the returned value to the default</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-18'>
+  <div class='section' id='section-17'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-18'>#</a>
+        <a class='octothorpe' href='#section-17'>#</a>
       </div>
       <p>Iterate through all changes, using <a href="http://packages.python.org/GitPython/0.3.1/reference.html#git.diff.DiffIndex">iter_change_type</a>
 to keep track of whats what</p>
@@ -301,10 +290,10 @@ to keep track of whats what</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-19'>
+  <div class='section' id='section-18'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-19'>#</a>
+        <a class='octothorpe' href='#section-18'>#</a>
       </div>
       <p>Setup FTP settings</p>
     </div>
@@ -313,10 +302,10 @@ to keep track of whats what</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-20'>
+  <div class='section' id='section-19'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-20'>#</a>
+        <a class='octothorpe' href='#section-19'>#</a>
       </div>
       <p>The following checks the config file for already set values.</p>
 <p>If the value is not found the user will be prompted for information.</p>
@@ -360,10 +349,10 @@ to keep track of whats what</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-21'>
+  <div class='section' id='section-20'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-21'>#</a>
+        <a class='octothorpe' href='#section-20'>#</a>
       </div>
       <p>Trim the remote dir of slashes the first slash will be prepended by the system.
 This means that all remote directories must be absolute.</p>
@@ -377,10 +366,10 @@ This means that all remote directories must be absolute.</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-22'>
+  <div class='section' id='section-21'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-22'>#</a>
+        <a class='octothorpe' href='#section-21'>#</a>
       </div>
       <p>Attempt to connect to the remote ftp server and change directory to the specified
 remote folder.</p>
@@ -400,10 +389,10 @@ remote folder.</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-23'>
+  <div class='section' id='section-22'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-23'>#</a>
+        <a class='octothorpe' href='#section-22'>#</a>
       </div>
       <p>Parse folders from the changed files</p>
     </div>
@@ -413,10 +402,10 @@ remote folder.</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-24'>
+  <div class='section' id='section-23'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-24'>#</a>
+        <a class='octothorpe' href='#section-23'>#</a>
       </div>
       <p>Run through each updated file and generate a dictionary tree of expected remote folders</p>
     </div>
@@ -432,10 +421,10 @@ remote folder.</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-25'>
+  <div class='section' id='section-24'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-25'>#</a>
+        <a class='octothorpe' href='#section-24'>#</a>
       </div>
       <p>Check remote for expected folders</p>
     </div>
@@ -444,10 +433,10 @@ remote folder.</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-26'>
+  <div class='section' id='section-25'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-26'>#</a>
+        <a class='octothorpe' href='#section-25'>#</a>
       </div>
       <p>Instead of keeping track of nesting levels etc, we use absolute paths on the remote server.</p>
     </div>
@@ -463,10 +452,10 @@ remote folder.</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-27'>
+  <div class='section' id='section-26'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-27'>#</a>
+        <a class='octothorpe' href='#section-26'>#</a>
       </div>
       <p>To test for the remote directory we use the tried and tested "better to ask forgiveness"</p>
     </div>
@@ -480,10 +469,10 @@ remote folder.</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-28'>
+  <div class='section' id='section-27'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-28'>#</a>
+        <a class='octothorpe' href='#section-27'>#</a>
       </div>
       <p>Recursively check the sub-folders of the current folder</p>
     </div>
@@ -495,10 +484,10 @@ remote folder.</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-29'>
+  <div class='section' id='section-28'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-29'>#</a>
+        <a class='octothorpe' href='#section-28'>#</a>
       </div>
       <p>Delete remote files if they have been deleted from the repository</p>
     </div>
@@ -514,10 +503,10 @@ remote folder.</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-30'>
+  <div class='section' id='section-29'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-30'>#</a>
+        <a class='octothorpe' href='#section-29'>#</a>
       </div>
       <p>Upload local files to remote</p>
     </div>
@@ -534,10 +523,10 @@ remote folder.</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-31'>
+  <div class='section' id='section-30'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-31'>#</a>
+        <a class='octothorpe' href='#section-30'>#</a>
       </div>
       <p>sumodule folder allready exists</p>
     </div>
@@ -546,10 +535,10 @@ remote folder.</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-32'>
+  <div class='section' id='section-31'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-32'>#</a>
+        <a class='octothorpe' href='#section-31'>#</a>
       </div>
       
     </div>
@@ -574,6 +563,21 @@ remote folder.</p>
     </div>
   </div>
   <div class='clearall'></div>
+  <div class='section' id='section-32'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-32'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">updateLast</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">infoWriter</span> <span class="o">=</span> <span class="n">ConfigWriter</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry</span><span class="p">:</span>
+            <span class="n">infoWriter</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="s">&#39;ftp&#39;</span><span class="p">,</span> <span class="s">&#39;lastDeploy&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">deployVersion</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
   <div class='section' id='section-33'>
     <div class='docs'>
       <div class='octowrap'>
@@ -582,23 +586,8 @@ remote folder.</p>
       
     </div>
     <div class='code'>
-      <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">updateLast</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">infoWriter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">config_writer</span><span class="p">()</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry</span><span class="p">:</span>
-            <span class="n">infoWriter</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="s">&#39;ftp&#39;</span><span class="p">,</span> <span class="s">&#39;lastDeploy&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">deployVersion</span><span class="p">)</span></pre></div>
-    </div>
-  </div>
-  <div class='clearall'></div>
-  <div class='section' id='section-34'>
-    <div class='docs'>
-      <div class='octowrap'>
-        <a class='octothorpe' href='#section-34'>#</a>
-      </div>
-      
-    </div>
-    <div class='code'>
       <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">saveConfig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">infoWriter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">config_writer</span><span class="p">()</span>
+        <span class="n">infoWriter</span> <span class="o">=</span> <span class="n">ConfigWriter</span><span class="p">()</span>
         <span class="n">infoWriter</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="s">&#39;ftp&#39;</span><span class="p">,</span> <span class="s">&#39;remoteUser&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">remoteUser</span><span class="p">)</span>
         <span class="n">infoWriter</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="s">&#39;ftp&#39;</span><span class="p">,</span> <span class="s">&#39;remoteDir&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">remoteDir</span><span class="p">)</span>
         <span class="n">infoWriter</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="s">&#39;ftp&#39;</span><span class="p">,</span> <span class="s">&#39;remoteServer&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">remoteServer</span><span class="p">)</span>
@@ -607,10 +596,10 @@ remote folder.</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-35'>
+  <div class='section' id='section-34'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-35'>#</a>
+        <a class='octothorpe' href='#section-34'>#</a>
       </div>
       
     </div>
@@ -628,10 +617,10 @@ remote folder.</p>
     </div>
   </div>
   <div class='clearall'></div>
-  <div class='section' id='section-36'>
+  <div class='section' id='section-35'>
     <div class='docs'>
       <div class='octowrap'>
-        <a class='octothorpe' href='#section-36'>#</a>
+        <a class='octothorpe' href='#section-35'>#</a>
       </div>
       
     </div>
