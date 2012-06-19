@@ -6,14 +6,18 @@ The script uses git to find changes since last deployment and applies the change
 
 
 Rationale
------
+---------
 Most shared hosting environments dont allow ssh, let alone git. To make sure all relevant changes are uploaded when your project reaches its next iteration this script runs a diff between your last deployment and current HEAD then syncs those changes with an FTP server.
 
 
 New in version:
------
+---------------
+### 0.7.0 ###
+*	Config now has a target specific option called `target_specific_files`, see the section on [config files](#config-files) for details
+	`target_specific_files` are provided instead of the proposed target specific branches.
+
 ### 0.6.2 ###
-* Ignored files can now be a standard [Glob](https://en.wikipedia.org/wiki/Glob_(programming)) pattern
+* Ignored files can now be a standard [Glob][Glob] pattern
 
 ### 0.6.1 ###
 * Deploying using a diff from a specific commit was not as useful as hoped, instead you can supply a named target
@@ -91,6 +95,46 @@ Advanced:
 
 Target is a named target server, the config file will keep track of individual targets and deployments
 
+Config files
+------------
+
+The config file is named `deploy.cfg` and is a standard ini-format file
+
+
+### Sections ###
+
+The `[global]` section holds options valid for all remotes.
+
+The `[ftp]` section and its siblings `[ftp:<target>]` represents individual deploy targets.
+
+A sample config file has been provided.
+
+### global.ignore ###
+
+#### Sample: ####
+
+	[global]
+	ignore = ["file1","file2","*.glob"]
+
+#### Explanation ####
+
+The `ignore` option must be placed in the `global` section and is a json array with each item representing a [Glob][Glob] pattern.
+
+Ignored files are not uploaded
+
+### target.target_specific_files ###
+
+#### Sample: ####
+
+	[ftp:target]
+	target_specific_files = {"config.ini":"config_online.ini",".htaccess",".htaccess_online"}
+
+#### Explanation ####
+
+The `target_specific_files` must be placed in a target section and takes the form of a json object. When looking at individual
+`key : value` pairs the `key` will be deleted online and `value` will take its place
+
+
 Tested environments:
 --------------------
 ### Windows versions: ###
@@ -109,12 +153,12 @@ If you have used this script anywhere else with success feel free to send me a m
 Todo for version 1:
 -------------------
 
-* Add active or passive mode to configuration options
 * Add `--revert` to quickly go back to last deployment
-* Bind a specific branch to a named deployment to merge config changes. (merge staging branch with current THEN upload)
 * Verbosity levels (_work in progress_)
 * Document command line options
 
 Thanks:
 -------
 [Adeodato Simó](http://martirioenbenidorm.blogspot.com/) for [raw_input with editable default](http://chistera.yi.org/~dato/blog/entries/2008/02/14/python_raw_input_with_an_editable_default_value_using_readline.html)
+
+[Glob]: (https://en.wikipedia.org/wiki/Glob_(programming))

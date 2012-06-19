@@ -268,6 +268,17 @@ class Deploy:
             except:
                 pass
 
+    def handleRename(self):
+        self.ftp.cwd('/' + self.remoteDir)
+        if self.configReader.has_option("ftp", "target_specific_files"):
+            swapMap = json.loads(self.configReader.get_value("ftp", "target_specific_files"))
+            for original, replacement in swapMap.iteritems():
+                if replacement in self.updatedFiles:
+                    self.out("Replacing", original, "with", replacement, verbosity=0)
+                    if not self.dry and os.path.isfile(original) and os.path:
+                        self.ftp.delete(original)
+                        self.ftp.rename(replacement, original)
+
     def updateLast(self):
         infoWriter = ConfigWriter(self.target)
         if not self.dry:
@@ -327,6 +338,7 @@ def main():
     deploy.saveConfig()
     deploy.updateLast()
     deploy.handleSubmodules()
+    deploy.handleRename()
 
 __all__ = ("Deploy", "main")
 if __name__ == "__main__":
