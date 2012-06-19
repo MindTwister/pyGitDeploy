@@ -9,6 +9,7 @@ import sys
 import os
 import getopt
 import json
+from fnmatch import fnmatch
 # See [[config]]
 from .config import *
 
@@ -46,8 +47,10 @@ class Deploy:
     def setVerbose(self, verbose):
         self.verbose = verbose
 
+    # Use [glob](https://en.wikipedia.org/wiki/Glob_(programming)) matching to check if a file
+    # is in the ignore list.
     def is_ignored(self, file):
-        return (file in self.ignored)
+        return (True in [fnmatch(file, pattern) for pattern in self.ignored])
 
     # Wrap raw_input/readline to show default values
     def raw_input_default(self, prompt, default):
@@ -91,6 +94,7 @@ class Deploy:
             # Grab all files in the repo
             for file in Git(self.repo.working_dir).ls_files().split("\n"):
                 if self.is_ignored(file):
+                    self.out("File:", file, "is ignored")
                     continue
                 self.out("  ", file, verbosity=4)
                 self.updatedFiles.append(file)
@@ -123,10 +127,8 @@ class Deploy:
         for fileRenamed in changes.iter_change_type('R'):
             self.out("  From: ", fileRenamed.a_blob.path, " to ", fileRenamed.b_blob.path)
 
-
     # Setup FTP settings
     def connectFTP(self, rebuild_config=False):
-
         # The following checks the config file for already set values.
         #
         # If the value is not found the user will be prompted for information.

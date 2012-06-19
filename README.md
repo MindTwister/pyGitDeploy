@@ -12,6 +12,9 @@ Most shared hosting environments dont allow ssh, let alone git. To make sure all
 
 New in version:
 -----
+### 0.6.2 ###
+* Ignored files can now be a standard [Glob](https://en.wikipedia.org/wiki/Glob_(programming)) pattern
+
 ### 0.6.1 ###
 * Deploying using a diff from a specific commit was not as useful as hoped, instead you can supply a named target
 * Config has been moved outside of the git folder and into the repo root

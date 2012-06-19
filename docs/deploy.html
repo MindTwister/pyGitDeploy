@@ -38,7 +38,8 @@
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">getopt</span>
-<span class="kn">import</span> <span class="nn">json</span></pre></div>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">fnmatch</span> <span class="kn">import</span> <span class="n">fnmatch</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -150,11 +151,12 @@ the repo makes sense.</p>
       <div class='octowrap'>
         <a class='octothorpe' href='#section-9'>#</a>
       </div>
-      
+      <p>Use <a href="https://en.wikipedia.org/wiki/Glob_(programming)">glob</a> matching to check if a file
+is in the ignore list.</p>
     </div>
     <div class='code'>
       <div class="highlight"><pre>    <span class="k">def</span> <span class="nf">is_ignored</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">file</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">(</span><span class="nb">file</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignored</span><span class="p">)</span></pre></div>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">True</span> <span class="ow">in</span> <span class="p">[</span><span class="n">fnmatch</span><span class="p">(</span><span class="nb">file</span><span class="p">,</span> <span class="n">pattern</span><span class="p">)</span> <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ignored</span><span class="p">])</span></pre></div>
     </div>
   </div>
   <div class='clearall'></div>
@@ -286,6 +288,7 @@ an empty string back, set the returned value to the default</p>
     <div class='code'>
       <div class="highlight"><pre>            <span class="k">for</span> <span class="nb">file</span> <span class="ow">in</span> <span class="n">Git</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">working_dir</span><span class="p">)</span><span class="o">.</span><span class="n">ls_files</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">):</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_ignored</span><span class="p">(</span><span class="nb">file</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="p">(</span><span class="s">&quot;File:&quot;</span><span class="p">,</span> <span class="nb">file</span><span class="p">,</span> <span class="s">&quot;is ignored&quot;</span><span class="p">)</span>
                     <span class="k">continue</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">out</span><span class="p">(</span><span class="s">&quot;  &quot;</span><span class="p">,</span> <span class="nb">file</span><span class="p">,</span> <span class="n">verbosity</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">updatedFiles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">file</span><span class="p">)</span>
