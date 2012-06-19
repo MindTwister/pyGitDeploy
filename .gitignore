@@ -1,5 +1,0 @@
-build/*
-pygitDeploy.egg*
-*.pyc
-deploy.cfg
-dist/*
