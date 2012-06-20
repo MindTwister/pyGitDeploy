@@ -1,0 +1,4 @@
+build/*
+pyGitDeploy.egg*
+*.pyc
+dist/*
