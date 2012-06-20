@@ -273,10 +273,12 @@ class Deploy:
         if self.configReader.has_option("ftp", "target_specific_files"):
             swapMap = json.loads(self.configReader.get_value("ftp", "target_specific_files"))
             for original, replacement in swapMap.iteritems():
-                if replacement in self.updatedFiles:
+                if replacement in self.updatedFiles or original in self.updatedFiles:
                     self.out("Replacing", original, "with", replacement, verbosity=0)
                     if not self.dry and os.path.isfile(original) and os.path:
                         self.ftp.delete(original)
+                        if self.ftp.size(replacement) is None:
+                            self.ftp.storbinary("STOR " + replacement, open(replacement, 'rb'))
                         self.ftp.rename(replacement, original)
 
     def updateLast(self):
