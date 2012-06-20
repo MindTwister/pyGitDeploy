@@ -1,4 +1,4 @@
 build/*
-pygitDeploy.egg*
+pyGitDeploy.egg*
 *.pyc
 dist/*
