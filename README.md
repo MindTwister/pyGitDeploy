@@ -12,9 +12,8 @@ Most shared hosting environments dont allow ssh, let alone git. To make sure all
 
 New in version:
 ---------------
-### 0.7.0 ###
-*	Config now has a target specific option called `target_specific_files`, see the section on [config files](#config-files) for details
-	`target_specific_files` are provided instead of the proposed target specific branches.
+### 0.7.1 ###
+*	Bugfix, checking for filesize when uploading a replacement file would trigger an exception. We now use that exception instead of filesize
 
 
 Requirements:
@@ -129,6 +128,10 @@ Thanks:
 
 Changelog:
 ----------
+
+### 0.7.0 ###
+*	Config now has a target specific option called `target_specific_files`, see the section on [config files](#config-files) for details
+	`target_specific_files` are provided instead of the proposed target specific branches.
 
 ### 0.6.2 ###
 * Ignored files can now be a standard [Glob][Glob] pattern

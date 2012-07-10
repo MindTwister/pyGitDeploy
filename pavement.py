@@ -5,7 +5,7 @@ import os
 setup(
     name="pyGitDeploy",
     packages=["deploy"],
-    version="0.7.0",
+    version="0.7.1",
     url="https://github.com/MindTwister/pyGitDeploy",
     author="Kristoffer Sall Hansen",
     author_email="kristoffer@sallhansen.dk",

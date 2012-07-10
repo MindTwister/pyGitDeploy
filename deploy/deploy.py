@@ -277,7 +277,9 @@ class Deploy:
                     self.out("Replacing", original, "with", replacement, verbosity=0)
                     if not self.dry and os.path.isfile(original) and os.path:
                         self.ftp.delete(original)
-                        if self.ftp.size(replacement) is None:
+                        try:
+                            self.ftp.size(replacement)
+                        except:
                             self.ftp.storbinary("STOR " + replacement, open(replacement, 'rb'))
                         self.ftp.rename(replacement, original)
 
@@ -338,9 +340,9 @@ def main():
     deploy.deleteFiles()
     deploy.uploadFiles()
     deploy.saveConfig()
-    deploy.updateLast()
     deploy.handleSubmodules()
     deploy.handleRename()
+    deploy.updateLast()
 
 __all__ = ("Deploy", "main")
 if __name__ == "__main__":
