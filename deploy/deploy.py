@@ -40,8 +40,10 @@ class Deploy:
         self.configReader = ConfigReader(target)
         self.configGlobal = ConfigReader()
         self.ignored = []
+        #Attempt to retrieve ignored files from the config file
         if self.configGlobal.has_option("global", "ignore"):
             self.ignored = json.loads(self.configGlobal.get_value("global", "ignore"))
+        #Always ignore deploy.cfg
         self.ignored.append("deploy.cfg")
 
     def setVerbose(self, verbose):
@@ -129,8 +131,7 @@ class Deploy:
 
     # Setup FTP settings
     def connectFTP(self, rebuild_config=False):
-        # The following checks the config file for already set values.
-        #
+        # Check the config file for already set values.
         # If the value is not found the user will be prompted for information.
         if self.configReader.has_option("ftp", "remoteServer"):
             self.remoteServer = self.configReader.get_value("ftp", "remoteServer")
@@ -250,6 +251,7 @@ class Deploy:
                     #sumodule folder allready exists
                     pass
 
+    #Upload files from submodules by creating new deploys
     def handleSubmodules(self):
         base = os.getcwd()
         for subModule in self.repo.submodules:
@@ -268,21 +270,30 @@ class Deploy:
             except:
                 pass
 
+    #Handle renaming target specific files
     def handleRename(self):
         self.ftp.cwd('/' + self.remoteDir)
+        #Check for `target_specific_files` in the config file
+        #This is a json object of the form { name1 : replacement1, name2 : replacement2 }
         if self.configReader.has_option("ftp", "target_specific_files"):
             swapMap = json.loads(self.configReader.get_value("ftp", "target_specific_files"))
             for original, replacement in swapMap.iteritems():
+                #Check if either the original or the replacement exists in the list
+                #of updated files.
                 if replacement in self.updatedFiles or original in self.updatedFiles:
                     self.out("Replacing", original, "with", replacement, verbosity=0)
                     if not self.dry and os.path.isfile(original) and os.path:
+                        #Delete the original file
                         self.ftp.delete(original)
+                        #If the replacement does not exist online, upload it
                         try:
                             self.ftp.size(replacement)
                         except:
                             self.ftp.storbinary("STOR " + replacement, open(replacement, 'rb'))
+                        #Rename the replacement file to the original
                         self.ftp.rename(replacement, original)
 
+    #Update the last deployment in the config file
     def updateLast(self):
         infoWriter = ConfigWriter(self.target)
         if not self.dry:
