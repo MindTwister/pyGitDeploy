@@ -9,6 +9,7 @@ import sys
 import os
 import getopt
 import json
+import tempfile
 from fnmatch import fnmatch
 # See [[config]]
 from .config import *
@@ -82,14 +83,19 @@ class Deploy:
 
     # Use git to check for files changed since last deploy.
     def checkFiles(self, deployVersion):
+        def storVersion(v):
+            self.lastDeploy = v
 
         self.deployVersion = self.repo.commit(deployVersion).name_rev.split(" ")[0]
+        #Attempt to read deployed version from online
+        try:
+            self.ftp.retrlines("RETR lastDeploy", storVersion)
+        except:
+            self.lastDeploy = None
 
-        # Check the config and see if a last deployment exists
-        if self.configReader.has_option("ftp", "lastDeploy"):
-            lastDeploy = self.configReader.get_value("ftp", "lastDeploy")
+        if self.lastDeploy != None:
             # Create a diff of changes between last deploy and current HEAD
-            changes = self.repo.commit(lastDeploy).diff(deployVersion)
+            changes = self.repo.commit(self.lastDeploy).diff(deployVersion)
         # In case no previous deployments exists
         else:
             self.out("No previous deployments, adding all files", verbosity=0)
@@ -295,9 +301,17 @@ class Deploy:
 
     #Update the last deployment in the config file
     def updateLast(self):
-        infoWriter = ConfigWriter(self.target)
+        #Create a temporary file to store the latest deployed version
+        (handle, fileName) = tempfile.mkstemp()
+        os.write(handle,self.deployVersion)
+        os.close(handle)
         if not self.dry:
-            infoWriter.set_value('ftp', 'lastDeploy', self.deployVersion)
+            #Upload the temporary file to the ftp server
+            self.ftp.storbinary("STOR lastDeploy", open(fileName, 'rb'))
+        #Clean up after ourselves
+        os.remove(fileName)
+
+
 
     def saveConfig(self):
         infoWriter = ConfigWriter(self.target)
@@ -344,9 +358,9 @@ def main():
 
     deploy = Deploy(path=os.getcwd(), verbosity=args["verbose"], dry=args["dry"], target=args["target"])
 
+    deploy.connectFTP()
     deploy.checkFiles("HEAD")
     deploy.parseDirectories()
-    deploy.connectFTP()
     deploy.checkDirectories()
     deploy.deleteFiles()
     deploy.uploadFiles()
