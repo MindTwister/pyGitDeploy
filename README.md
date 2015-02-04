@@ -103,13 +103,15 @@ Tested environments:
 --------------------
 ### Windows versions: ###
 * Windows 7
+* Windows 8
+* Windows 8.1
 
 ### Linux versions: ###
 * Mint 11-12
-* Ubuntu 10+
+* Ubuntu 10-14
 
 ### Python versions: ###
-* 2.7.1
+* 2.7.1-2.7.6
 
 If you have used this script anywhere else with success feel free to send me a message and I will update this document.
 
