@@ -106,12 +106,16 @@ Tested environments:
 * Windows 8
 * Windows 8.1
 
+### OS X versions: ###
+Note: osx may require manual installation of gitpython using pip or easy_install. `pip install gitpython` did the trick for me.
+* El Capitan
+
 ### Linux versions: ###
 * Mint 11-12
 * Ubuntu 10-14
 
 ### Python versions: ###
-* 2.7.1-2.7.6
+* 2.7.1-2.7.10
 
 If you have used this script anywhere else with success feel free to send me a message and I will update this document.
 
